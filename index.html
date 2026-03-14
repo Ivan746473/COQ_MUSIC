@@ -3,81 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kai Angel - Are You Happy?</title>
+    <title>Kai Angel - Are You Happy? | CM MUSIC</title>
     <style>
-        body { background: linear-gradient(180deg, #1a0b1a 0%, #000000 100%); color: #fff0f5; font-family: sans-serif; padding: 20px; text-align: center; min-height: 100vh; margin: 0; }
-        .header { font-size: 20px; font-weight: bold; color: #e1b1ff; margin-bottom: 20px; text-shadow: 0 0 15px rgba(225, 177, 255, 0.4); letter-spacing: 2px; }
-        .track-img { width: 250px; height: 250px; border-radius: 15px; object-fit: cover; border: 1px solid #4a2d4d; margin-bottom: 15px; box-shadow: 0 0 30px rgba(160, 100, 200, 0.2); }
-        .lyrics-container { height: 220px; overflow-y: hidden; margin: 20px 0; font-size: 17px; line-height: 1.8; mask-image: linear-gradient(transparent, black 25%, black 75%, transparent); }
-        .lyrics-line { opacity: 0.2; transition: 0.4s; color: #d8bfd8; }
-        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.05); font-weight: bold; }
-        audio { width: 100%; filter: invert(80%) sepia(50%) saturate(1000%) hue-rotate(240deg); margin-top: 15px; border-radius: 30px; }
-        .dev-panel { background: rgba(225, 177, 255, 0.05); padding: 15px; border-radius: 20px; border: 1px dashed #4a2d4d; margin-top: 30px; }
-        button { background: #e1b1ff; color: #1a0b1a; border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; margin: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #log { background: #000; color: #e1b1ff; font-family: monospace; font-size: 10px; padding: 15px; text-align: left; margin-top: 15px; white-space: pre-wrap; display: none; border: 1px solid #4a2d4d; }
+        body { background: linear-gradient(180deg, #1a0b1a 0%, #000000 100%); color: #fff0f5; font-family: sans-serif; padding: 20px; text-align: center; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .header { font-size: 16px; font-weight: bold; color: #e1b1ff; margin-bottom: 30px; text-shadow: 0 0 15px rgba(225, 177, 255, 0.4); letter-spacing: 4px; text-transform: uppercase; }
+        .track-img { width: 280px; height: 280px; border-radius: 20px; object-fit: cover; border: 1px solid #4a2d4d; margin-bottom: 20px; box-shadow: 0 0 40px rgba(160, 100, 200, 0.2); }
+        .track-info { margin-bottom: 25px; }
+        .track-title { font-weight: bold; font-size: 24px; color: #e1b1ff; margin-bottom: 5px; }
+        .track-artist { opacity: 0.5; font-size: 16px; letter-spacing: 1px; }
+
+        .lyrics-container { height: 250px; overflow-y: hidden; width: 100%; max-width: 400px; margin-bottom: 30px; position: relative; mask-image: linear-gradient(transparent, black 30%, black 70%, transparent); }
+        .lyrics-content { transition: transform 0.5s ease-in-out; }
+        .lyrics-line { opacity: 0.15; transition: 0.4s; color: #d8bfd8; font-size: 18px; margin: 20px 0; padding: 0 10px; }
+        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); font-weight: bold; text-shadow: 0 0 10px rgba(225, 177, 255, 0.5); }
+
+        audio { width: 100%; max-width: 320px; filter: invert(80%) sepia(50%) saturate(1000%) hue-rotate(240deg); border-radius: 30px; }
     </style>
 </head>
 <body>
-    <div class="header">CM MUSIC • VIPERR</div>
+    <div class="header">CM MUSIC PLAYER</div>
+    
     <img src="https://files.catbox.moe/p9pghz.jpg" class="track-img">
-    <div style="font-weight: bold; font-size: 22px; color: #e1b1ff;">Are You Happy?</div>
-    <div style="opacity: 0.5; font-size: 14px; margin-bottom: 10px;">Kai Angel</div>
-
-    <div class="lyrics-container" id="lrc-list"></div>
-    <audio id="audio-player" controls></audio>
-
-    <div class="dev-panel">
-        <p style="font-size: 11px; text-transform: uppercase;">Синхронизация текста:</p>
-        <button onclick="markTime()">🎵 МЕТКА ВРЕМЕНИ</button>
-        <button onclick="showResult()">СКОПИРОВАТЬ ТАЙМИНГИ</button>
-        <div id="log"></div>
+    
+    <div class="track-info">
+        <div class="track-title">Are You Happy?</div>
+        <div class="track-artist">Kai Angel</div>
     </div>
+
+    <div class="lyrics-container">
+        <div class="lyrics-content" id="lyrics-content"></div>
+    </div>
+
+    <audio id="audio-player" controls src="https://files.catbox.moe/w92z79.mp3"></audio>
 
     <script>
         const audio = document.getElementById('audio-player');
-        const lrcList = document.getElementById('lrc-list');
-        const log = document.getElementById('log');
+        const content = document.getElementById('lyrics-content');
 
-        const rawLyrics = [
-            "Are you happy? (Are you happy?)", "‘Cause you look sad", "Like a church with no choir", "Like a God gone mad", "Like a God gone mad on the edge of the night",
-            "I don’t see your smile", "Your voice just doesn’t land", "I’m familiar with your desire", "And it’s very different than what’s in your hands",
-            "Hold me like a secret", "But scream in my ear", "Tell me you love me", "Then disappear", "I don’t want the truth", "I just want a touch", "Bleed me slow", "But don’t ask for it too much", "Bleed me slow, wow",
-            "Окей, держи меня в секрете", "И не рассказывай никому в интернете", "Ты в моих снах буквально каждый день", "I still see your eyes through the rain", "I still feel your scent like a subtle stain", "You leave ghosts in midnight air", "It’s still on my mind how you",
-            "Hold me like a secret", "But scream in my ear", "Tell me you love me", "Then disappear", "I don’t want the truth", "I just want a touch", "Bleed me slow", "But don’t ask for it too much",
-            "Baby, I love every surgery you did", "If I was a knife, I would stab somewhere in between", "Maybe I’m not the one to hold you like this", "But you", "Hold me like a secret",
-            "You scream in my ear", "Tell me you love me (Do you love me?)", "Then disappear", "I don’t want the truth", "I just want a touch", "But don’t ask for it too much",
-            "But scream in my ear", "Tell me you love me", "Then disappear", "I don’t want the truth", "I just want a touch", "Bleed me slow", "But don’t ask for it too much"
+        const lyrics = [
+            [1, "Are you happy? (Are you happy?)"], [6, "‘Cause you look sad"], [10, "Like a church with no choir"], [15, "Like a God gone mad"], [19, "Like a God gone mad on the edge of the night"], [32, "I don’t see your smile"], [36, "Your voice just doesn’t land"], [40, "I’m familiar with your desire"], [43, "And it’s very different than what’s in your hands"], [49, "Hold me like a secret"], [53, "But scream in my ear"], [55, "Tell me you love me"], [59, "Then disappear"], [61, "I don’t want the truth"], [63, "I just want a touch"], [65, "Bleed me slow"], [67, "But don’t ask for it too much"], [76, "Bleed me slow, wow"], [81, "Окей, держи меня в секрете"], [83, "И не рассказывай никому в интернете"], [85, "Ты в моих снах буквально каждый день"], [87, "I still see your eyes through the rain"], [90, "I still feel your scent like a subtle stain"], [93, "You leave ghosts in midnight air"], [95, "It’s still on my mind how you"], [97, "Hold me like a secret"], [100, "But scream in my ear"], [103, "Tell me you love me"], [107, "Then disappear"], [109, "I don’t want the truth"], [112, "I just want a touch"], [113, "Bleed me slow"], [116, "But don’t ask for it too much"], [120, "Baby, I love every surgery you did"], [124, "If I was a knife, I would stab somewhere in between"], [129, "Maybe I’m not the one to hold you like this"], [134, "But you"], [135, "Hold me like a secret"], [139, "You scream in my ear"], [141, "Tell me you love me (Do you love me?)"], [145, "Then disappear"], [148, "I don’t want the truth"], [150, "I just want a touch"], [154, "But don’t ask for it too much"], [168, "But scream in my ear"], [170, "Tell me you love me"], [174, "Then disappear"], [176, "I don’t want the truth"], [179, "I just want a touch"], [181, "Bleed me slow"], [183, "But don’t ask for it too much"]
         ];
 
-        let syncData = [];
-        let currentLine = 0;
-
-        // Вставь свою ссылку на mp3 сюда:
-        audio.src = "https://files.catbox.moe/w92z79.mp3"; 
-
-        rawLyrics.forEach((text, i) => {
+        // Отрисовка текста
+        lyrics.forEach((line, i) => {
             const div = document.createElement('div');
             div.className = 'lyrics-line';
             div.id = `line-${i}`;
-            div.innerText = text;
-            lrcList.appendChild(div);
+            div.innerText = line[1];
+            content.appendChild(div);
         });
 
-        function markTime() {
-            const time = Math.floor(audio.currentTime);
-            if (currentLine < rawLyrics.length) {
-                syncData.push(`[${time}, "${rawLyrics[currentLine]}"]`);
-                document.querySelectorAll('.lyrics-line').forEach(el => el.classList.remove('active'));
-                const activeLine = document.getElementById(`line-${currentLine}`);
-                activeLine.classList.add('active');
-                activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                currentLine++;
+        // Слежение за временем
+        audio.ontimeupdate = () => {
+            const currentTime = audio.currentTime;
+            
+            for (let i = 0; i < lyrics.length; i++) {
+                if (currentTime >= lyrics[i][0] && (!lyrics[i+1] || currentTime < lyrics[i+1][0])) {
+                    updateLyrics(i);
+                    break;
+                }
             }
-        }
+        };
 
-        function showResult() {
-            log.style.display = 'block';
-            log.innerText = "lyrics: [\n  " + syncData.join(",\n  ") + "\n]";
+        function updateLyrics(index) {
+            const lines = document.querySelectorAll('.lyrics-line');
+            lines.forEach(line => line.classList.remove('active'));
+            
+            const activeLine = document.getElementById(`line-${index}`);
+            if (activeLine) {
+                activeLine.classList.add('active');
+                // Плавная прокрутка: считаем отступ
+                const offset = index * 58; // 58 - примерная высота строки с отступами
+                content.style.transform = `translateY(-${offset}px)`;
+            }
         }
     </script>
 </body>
