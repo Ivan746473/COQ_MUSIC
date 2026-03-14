@@ -3,42 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>COQM</title>
+    <title>COQM PRO</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 20px; box-sizing: border-box; overflow: hidden; }
+        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 30px 20px; box-sizing: border-box; overflow: hidden; }
         .header-label { font-size: 10px; opacity: 0.4; text-transform: uppercase; letter-spacing: 4px; }
-        .track-img { width: 75vw; height: 75vw; max-width: 280px; max-height: 280px; border-radius: 20px; object-fit: cover; box-shadow: 0 0 40px rgba(225, 177, 255, 0.2); border: 1.5px solid #e1b1ff; }
+        
+        /* Обложка */
+        .track-img { width: 70vw; height: 70vw; max-width: 260px; max-height: 260px; border-radius: 20px; object-fit: cover; box-shadow: 0 0 40px rgba(225, 177, 255, 0.2); border: 1.5px solid #e1b1ff; background: #1a1a1a; }
+        
         .track-info { text-align: center; }
-        .track-title { font-weight: 700; font-size: 24px; color: #e1b1ff; margin-bottom: 5px; }
-        .track-artist { opacity: 0.5; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
-        .lyrics-container { height: 160px; width: 100%; overflow: hidden; mask-image: linear-gradient(transparent, black 25%, black 75%, transparent); margin: 15px 0; }
+        .track-title { font-weight: 700; font-size: 22px; color: #e1b1ff; margin-bottom: 5px; }
+        .track-artist { opacity: 0.5; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Караоке */
+        .lyrics-container { height: 120px; width: 100%; overflow: hidden; mask-image: linear-gradient(transparent, black 25%, black 75%, transparent); margin: 10px 0; }
         .lyrics-content { transition: transform 0.4s ease-out; text-align: center; }
-        .lyrics-line { opacity: 0.15; font-size: 19px; font-weight: 700; margin: 25px 0; transition: 0.3s; line-height: 1.2; }
+        .lyrics-line { opacity: 0.15; font-size: 18px; font-weight: 700; margin: 20px 0; transition: 0.3s; }
         .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); text-shadow: 0 0 15px rgba(225, 177, 255, 0.6); }
-        .controls-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+        /* Управление */
+        .controls-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .progress-area { width: 90%; display: flex; align-items: center; gap: 10px; font-size: 10px; color: #e1b1ff; }
-        #progress-bar { flex-grow: 1; height: 4px; background: rgba(225, 177, 255, 0.1); border-radius: 10px; }
+        #progress-bar { flex-grow: 1; height: 4px; background: rgba(225, 177, 255, 0.1); border-radius: 10px; position: relative; }
         #progress-filled { height: 100%; background: #e1b1ff; border-radius: 10px; width: 0%; box-shadow: 0 0 10px #e1b1ff; }
-        .btns-group { display: flex; align-items: center; justify-content: center; gap: 35px; }
+        
+        .btns-group { display: flex; align-items: center; justify-content: center; gap: 30px; }
         .btn { background: none; border: none; padding: 0; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
-        .btn svg { fill: #e1b1ff; filter: drop-shadow(0 0 5px rgba(225, 177, 255, 0.4)); }
-        .btn:active { transform: scale(0.9); }
-        .btn-play svg { width: 70px; height: 70px; }
+        .btn svg { fill: #e1b1ff; }
+        .btn-play svg { width: 65px; height: 65px; }
         .btn-side svg { width: 40px; height: 40px; }
+
+        /* Твои функции (Метки времени) */
+        .tools-group { display: flex; gap: 10px; margin-top: 10px; }
+        .tool-btn { background: rgba(225, 177, 255, 0.1); border: 1px solid #e1b1ff; color: #e1b1ff; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        #debug-time { font-family: monospace; font-size: 14px; color: #e1b1ff; margin-top: 5px; min-height: 20px; }
+        
         audio { display: none; }
     </style>
 </head>
 <body>
     <div class="header-label">Viperr Music OS</div>
     <img id="cover" src="1000061104.jpg" class="track-img">
+    
     <div class="track-info">
-        <div id="title" class="track-title">Loading...</div>
-        <div id="artist" class="track-artist">Loading...</div>
+        <div id="title" class="track-title">Загрузка...</div>
+        <div id="artist" class="track-artist">Загрузка...</div>
     </div>
+
     <div class="lyrics-container"><div class="lyrics-content" id="lyrics-content"></div></div>
+
     <div class="controls-wrapper">
         <div class="progress-area">
             <span id="currentTime">0:00</span>
@@ -47,23 +61,28 @@
         </div>
         <div class="btns-group">
             <button class="btn btn-side" onclick="prev()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-            <button class="btn btn-play" onclick="toggle()">
-                <svg viewBox="0 0 24 24"><path id="playPath" d="M8 5v14l11-7z"/></svg>
-            </button>
+            <button class="btn btn-play" onclick="toggle()"><svg viewBox="0 0 24 24"><path id="playPath" d="M8 5v14l11-7z"/></svg></button>
             <button class="btn btn-side" onclick="next()"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0l8.5 6-8.5 6z"/></svg></button>
         </div>
+
+        <div class="tools-group">
+            <button class="tool-btn" onclick="showTime()">Метка времени</button>
+            <button class="tool-btn" onclick="copyTiming()">Получить тайминг</button>
+        </div>
+        <div id="debug-time"></div>
     </div>
+
     <audio id="player"></audio>
 
     <script>
         const playlist = [
             {
                 title: "Are You Happy?", artist: "Kai Angel", cover: "1000061104.jpg", src: "https://files.catbox.moe/w92z79.mp3",
-                lyrics: [[0,"Are you happy?"],[6,"Cause you look sad"],[10,"Like a church with no choir"],[15,"Like a God gone mad"],[19,"Like a God gone mad on the edge of the night"]]
+                lyrics: [[0,"Are you happy?"],[6,"Cause you look sad"],[10,"Like a church with no choir"],[15,"Like a God gone mad"]]
             },
             {
                 title: "Мой драгдилер", artist: "Hanna", cover: "1000061112.jpg", src: "https://files.catbox.moe/hok7ud.mp3",
-                lyrics: [[0,"Меня любит мой драгдилер"],[4,"Меня любит мой, сука, драгдилер"],[8,"Меня любит мой друг-дилер"],[12,"Меня любит мой, сука, драгдилер"],[16,"Меня любит мой plug, ohh my God"],[20,"Заберу всё, что мне надо"],[24,"К чёрту их букеты, подари мне сад"],[28,"Я пакую снег на трэпе, выдыхаю газ"],[32,"Мои деньги выше меня"],[36,"Мама показала, как сыну кушать заны"],[40,"Мама рассказала, как курить марихуану"]]
+                lyrics: [[0,"Меня любит мой драгдилер"],[4,"Меня любит мой, сука, драгдилер"],[8,"Меня любит мой друг-дилер"],[12,"Меня любит мой, сука, драгдилер"]]
             }
         ];
 
@@ -71,6 +90,18 @@
         const audio = document.getElementById('player');
         const playPath = document.getElementById('playPath');
         const content = document.getElementById('lyrics-content');
+        const debug = document.getElementById('debug-time');
+
+        // Функции для создания караоке
+        function showTime() {
+            debug.innerText = "Время: " + audio.currentTime.toFixed(2) + " сек.";
+        }
+        function copyTiming() {
+            const time = Math.floor(audio.currentTime);
+            const format = `[${time}, ""],`;
+            debug.innerText = "Скопировано: " + format;
+            navigator.clipboard.writeText(format).catch(() => {});
+        }
 
         function load(i) {
             const t = playlist[i];
@@ -90,15 +121,15 @@
         function toggle() {
             if (audio.paused) {
                 audio.play();
-                playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); // Пауза
+                playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
             } else {
                 audio.pause();
-                playPath.setAttribute('d', 'M8 5v14l11-7z'); // Плей
+                playPath.setAttribute('d', 'M8 5v14l11-7z');
             }
         }
 
-        function next() { idx = (idx + 1) % playlist.length; load(idx); audio.play(); playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); }
-        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); audio.play(); playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); }
+        function next() { idx = (idx + 1) % playlist.length; load(idx); toggle(); toggle(); }
+        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); toggle(); toggle(); }
 
         audio.ontimeupdate = () => {
             const cur = audio.currentTime;
@@ -115,7 +146,7 @@
                     const currentLine = document.getElementById(`l-${i}`);
                     if (currentLine) {
                         currentLine.classList.add('active');
-                        content.style.transform = `translateY(-${i * 50 - 70}px)`;
+                        content.style.transform = `translateY(-${i * 45 - 40}px)`;
                     }
                     break;
                 }
