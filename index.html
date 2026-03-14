@@ -8,84 +8,33 @@
     <title>COQ MUSIC</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-        body { 
-            background: #000; 
-            color: #fff; 
-            font-family: 'Montserrat', sans-serif; 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 40px 20px;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
+        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 20px; box-sizing: border-box; overflow: hidden; }
         .header-label { font-size: 10px; letter-spacing: 4px; opacity: 0.4; text-transform: uppercase; }
-
-        .track-img { 
-            width: 70vw; height: 70vw; max-width: 280px; max-height: 280px; 
-            border-radius: 30px; object-fit: cover; 
-            box-shadow: 0 0 40px rgba(160, 100, 200, 0.4); 
-            border: 1px solid #333;
-        }
-
+        .track-img { width: 75vw; height: 75vw; max-width: 300px; max-height: 300px; border-radius: 20px; object-fit: cover; box-shadow: 0 0 50px rgba(225, 177, 255, 0.3); border: 2px solid #e1b1ff; background: #1a1a1a; }
         .track-info { text-align: center; }
-        .track-title { font-weight: 700; font-size: 26px; color: #e1b1ff; margin-bottom: 5px; }
+        .track-title { font-weight: 700; font-size: 28px; color: #e1b1ff; margin-bottom: 5px; }
         .track-artist { opacity: 0.5; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
-
-        .lyrics-container { 
-            height: 160px; width: 100%; overflow: hidden;
-            mask-image: linear-gradient(transparent, black 30%, black 70%, transparent);
-            margin: 20px 0;
-        }
-
-        .lyrics-content { transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .lyrics-line { 
-            opacity: 0.15; font-size: 20px; font-weight: 700; margin: 25px 0; 
-            transition: 0.3s; line-height: 1.2; text-align: center;
-        }
-        .lyrics-line.active { 
-            opacity: 1; color: #e1b1ff; transform: scale(1.1); 
-            text-shadow: 0 0 20px rgba(225, 177, 255, 0.7); 
-        }
-
+        .lyrics-container { height: 160px; width: 100%; overflow: hidden; mask-image: linear-gradient(transparent, black 30%, black 70%, transparent); margin: 20px 0; }
+        .lyrics-content { transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); text-align: center; }
+        .lyrics-line { opacity: 0.15; font-size: 22px; font-weight: 700; margin: 25px 0; transition: 0.3s; line-height: 1.2; }
+        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); text-shadow: 0 0 20px rgba(225, 177, 255, 0.7); }
         .controls-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        
         .progress-area { width: 90%; display: flex; align-items: center; gap: 10px; font-size: 11px; color: #e1b1ff; }
         #progress-bar { flex-grow: 1; height: 4px; background: rgba(225, 177, 255, 0.1); border-radius: 10px; position: relative; }
         #progress-filled { height: 100%; background: #e1b1ff; border-radius: 10px; width: 0%; box-shadow: 0 0 15px #e1b1ff; }
-
         .btns-group { display: flex; align-items: center; justify-content: center; gap: 40px; }
-        
-        /* Новые кнопки на чистом коде (без фона) */
-        .btn { 
-            background: none; border: none; 
-            padding: 0; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
+        .btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; outline: none; -webkit-tap-highlight-color: transparent; }
         .btn svg { fill: #e1b1ff; filter: drop-shadow(0 0 8px rgba(225, 177, 255, 0.5)); }
-
         .btn:active { transform: scale(0.9); }
-        .btn:active svg { fill: #fff; filter: drop-shadow(0 0 15px #e1b1ff); }
-
         .btn-play svg { width: 80px; height: 80px; }
         .btn-side svg { width: 45px; height: 45px; }
-
         audio { display: none; }
     </style>
 </head>
 <body>
     <div class="header-label">Viperr Music OS</div>
     
-    <img id="cover" src="https://files.catbox.moe/p9pghz.jpg" class="track-img">
+    <img id="cover" src="cover.jpg" class="track-img">
     
     <div class="track-info">
         <div id="title" class="track-title">Are You Happy?</div>
@@ -102,21 +51,10 @@
             <div id="progress-bar"><div id="progress-filled"></div></div>
             <span id="durationTime">0:00</span>
         </div>
-
         <div class="btns-group">
-            <button class="btn btn-side" onclick="prev()">
-                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-            </button>
-            
-            <button class="btn btn-play" onclick="toggle()">
-                <svg id="playIcon" viewBox="0 0 24 24">
-                    <path id="playPath" d="M8 5v14l11-7z"/>
-                </svg>
-            </button>
-
-            <button class="btn btn-side" onclick="next()">
-                <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0l8.5 6-8.5 6z"/></svg>
-            </button>
+            <button class="btn btn-side" onclick="prev()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+            <button class="btn btn-play" onclick="toggle()"><svg id="playIcon" viewBox="0 0 24 24"><path id="playPath" d="M8 5v14l11-7z"/></svg></button>
+            <button class="btn btn-side" onclick="next()"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0l8.5 6-8.5 6z"/></svg></button>
         </div>
     </div>
 
@@ -125,7 +63,7 @@
     <script>
         const playlist = [{
             title: "Are You Happy?", artist: "Kai Angel",
-            cover: "https://files.catbox.moe/p9pghz.jpg",
+            cover: "cover.jpg",
             src: "https://files.catbox.moe/w92z79.mp3",
             lyrics: [[1, "Are you happy? (Are you happy?)"], [6, "‘Cause you look sad"], [10, "Like a church with no choir"], [15, "Like a God gone mad"], [19, "Like a God gone mad on the edge of the night"], [32, "I don’t see your smile"], [36, "Your voice just doesn’t land"], [40, "I’m familiar with your desire"], [43, "And it’s very different than what’s in your hands"], [49, "Hold me like a secret"], [53, "But scream in my ear"], [55, "Tell me you love me"], [59, "Then disappear"], [61, "I don’t want the truth"], [63, "I just want a touch"], [65, "Bleed me slow"], [67, "But don’t ask for it too much"], [76, "Bleed me slow, wow"], [81, "Окей, держи меня в секрете"], [83, "И не рассказывай никому в интернете"], [85, "Ты в моих снах буквально каждый день"], [87, "I still see your eyes through the rain"], [90, "I still feel your scent like a subtle stain"], [93, "You leave ghosts in midnight air"], [95, "It’s still on my mind how you"], [97, "Hold me like a secret"], [100, "But scream in my ear"], [103, "Tell me you love me"], [107, "Then disappear"], [109, "I don’t want the truth"], [112, "I just want a touch"], [113, "Bleed me slow"], [116, "But don’t ask for it too much"], [120, "Baby, I love every surgery you did"], [124, "If I was a knife, I would stab somewhere in between"], [129, "Maybe I’m not the one to hold you like this"], [134, "But you"], [135, "Hold me like a secret"], [139, "You scream in my ear"], [141, "Tell me you love me (Do you love me?)"], [145, "Then disappear"], [148, "I don’t want the truth"], [150, "I just want a touch"], [154, "But don’t ask for it too much"], [168, "But scream in my ear"], [170, "Tell me you love me"], [174, "Then disappear"], [176, "I don’t want the truth"], [179, "I just want a touch"], [181, "Bleed me slow"], [183, "But don’t ask for it too much"]]
         }];
@@ -150,13 +88,8 @@
         }
 
         function toggle() {
-            if (audio.paused) {
-                audio.play();
-                playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); // Иконка Паузы
-            } else {
-                audio.pause();
-                playPath.setAttribute('d', 'M8 5v14l11-7z'); // Иконка Плея
-            }
+            if (audio.paused) { audio.play(); playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); }
+            else { audio.pause(); playPath.setAttribute('d', 'M8 5v14l11-7z'); }
         }
 
         audio.ontimeupdate = () => {
@@ -172,19 +105,13 @@
                 if (cur >= lrc[i][0] && (!lrc[i+1] || cur < lrc[i+1][0])) {
                     document.querySelectorAll('.lyrics-line').forEach(el => el.classList.remove('active'));
                     const a = document.getElementById(`l-${i}`);
-                    if (a) {
-                        a.classList.add('active');
-                        content.style.transform = `translateY(-${i * 50 - 70}px)`;
-                    }
+                    if (a) { a.classList.add('active'); content.style.transform = `translateY(-${i * 50 - 70}px)`; }
                     break;
                 }
             }
         };
 
-        function fmt(s) {
-            const m = Math.floor(s/60); const sc = Math.floor(s%60);
-            return `${m}:${sc < 10 ? '0' : ''}${sc}`;
-        }
+        function fmt(s) { const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc < 10 ? '0' : ''}${sc}`; }
         load(0);
     </script>
 </body>
