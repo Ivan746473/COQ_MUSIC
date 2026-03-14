@@ -3,89 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CM Music</title>
+    <title>CM Music Pink</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+        body { 
+            background: linear-gradient(180deg, #2b1a1d 0%, #121212 100%); 
+            color: #fff0f5; 
+            font-family: 'Segoe UI', sans-serif; 
+            padding: 20px; 
+            text-align: center; 
             min-height: 100vh;
         }
         .header { 
             font-size: 28px; 
-            font-weight: 800; 
-            margin: 20px 0 30px 0; 
-            color: #1DB954; 
-            text-align: center;
-            letter-spacing: -1px;
-        }
-        .player-card {
-            background: #181818;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
+            font-weight: bold; 
+            color: #ffb6c1; /* Бледно-розовый */
+            text-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
+            margin-bottom: 20px; 
         }
         .track-img { 
-            width: 100%; 
-            aspect-ratio: 1/1; 
-            border-radius: 10px; 
-            background: #282828; 
-            margin-bottom: 15px;
-            object-fit: cover;
+            width: 250px; height: 250px; 
+            border-radius: 20px; 
+            object-fit: cover; 
+            margin-bottom: 15px; 
+            box-shadow: 0 10px 25px rgba(255, 192, 203, 0.2); 
+            border: 2px solid #ffb6c1;
         }
-        .track-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .artist { color: #b3b3b3; font-size: 15px; margin-bottom: 15px; }
+        .name { font-size: 22px; font-weight: bold; color: #fff; }
+        .artist { color: #ffdae0; opacity: 0.8; margin-bottom: 20px; }
+        
+        /* Контейнер для караоке-текста */
+        .lyrics-container {
+            height: 220px;
+            overflow-y: hidden;
+            margin: 20px 0;
+            mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
+            font-size: 18px;
+            line-height: 2;
+        }
+        .lyrics-line { opacity: 0.2; transition: all 0.4s; padding: 5px 0; color: #ffd1dc; }
+        .lyrics-line.active { 
+            opacity: 1; 
+            color: #ffb6c1; 
+            transform: scale(1.1); 
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 182, 193, 0.8);
+        }
+        
         audio { 
             width: 100%; 
-            height: 40px;
-            filter: invert(100%) hue-rotate(180deg) brightness(1.5); 
+            filter: invert(30%) sepia(100%) saturate(200%) hue-rotate(300deg) brightness(1.2); 
+            margin-top: 20px; 
+            border-radius: 50px;
         }
-        .footer-btn {
-            display: block;
-            width: 200px;
-            margin: 40px auto;
-            background: #1DB954;
-            color: black;
+
+        .close-btn {
+            background: #ffb6c1;
+            color: #4a1e25;
             border: none;
-            padding: 15px;
-            border-radius: 30px;
+            padding: 10px 25px;
+            border-radius: 20px;
             font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-            font-size: 16px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="header">CM Music</div>
     
-    <div class="player-card">
-        <img src="https://via.placeholder.com/300/282828/1DB954?text=CM" class="track-img">
-        <div class="track-name">Название песни</div>
-        <div class="artist">Исполнитель</div>
-        <audio controls>
-            <source src="ССЫЛКА_НА_МУЗЫКУ_1.mp3" type="audio/mpeg">
-        </audio>
+    <div id="player">
+        <img id="cover" src="https://via.placeholder.com/300/2b1a1d/ffb6c1?text=CM" class="track-img">
+        <div class="info">
+            <div id="title" class="name">Название песни</div>
+            <div id="author" class="artist">Исполнитель</div>
+        </div>
+        
+        <div class="lyrics-container" id="lrc-list">
+            </div>
+
+        <audio id="audio-player" controls></audio>
     </div>
 
-    <div class="player-card">
-        <img src="https://via.placeholder.com/300/282828/1DB954?text=CM" class="track-img">
-        <div class="track-name">Второй трек</div>
-        <div class="artist">Исполнитель</div>
-        <audio controls>
-            <source src="ССЫЛКА_НА_МУЗЫКУ_2.mp3" type="audio/mpeg">
-        </audio>
-    </div>
-
-    <button class="footer-btn" onclick="window.Telegram.WebApp.close()">Закрыть плеер</button>
+    <button class="close-btn" onclick="window.Telegram.WebApp.close()">Закрыть</button>
 
     <script>
+        const audio = document.getElementById('audio-player');
+        const lrcList = document.getElementById('lrc-list');
         window.Telegram.WebApp.expand();
+
+        // ДАННЫЕ (Поменяй на свои)
+        const track = {
+            name: "Твоя любимая песня",
+            artist: "Исполнитель",
+            img: "ССЫЛКА_НА_РОЗОВУЮ_ОБЛОЖКУ",
+            url: "ССЫЛКА_НА_МУЗЫКУ.mp3",
+            lyrics: [
+                [0, "♪ Розовое оформление готово ♪"],
+                [5, "Текст будет листаться сам"],
+                [10, "Как только ты добавишь время"],
+                [15, "Надеюсь, тебе нравится этот стиль!"],
+                [20, "CM Music в нежных тонах..."]
+            ]
+        };
+
+        document.getElementById('title').innerText = track.name;
+        document.getElementById('author').innerText = track.artist;
+        document.getElementById('cover').src = track.img;
+        audio.src = track.url;
+
+        track.lyrics.forEach((line, index) => {
+            const div = document.createElement('div');
+            div.className = 'lyrics-line';
+            div.id = `line-${index}`;
+            div.innerText = line[1];
+            lrcList.appendChild(div);
+        });
+
+        audio.ontimeupdate = () => {
+            const curTime = audio.currentTime;
+            track.lyrics.forEach((line, index) => {
+                if (curTime >= line[0]) {
+                    document.querySelectorAll('.lyrics-line').forEach(el => el.classList.remove('active'));
+                    const activeLine = document.getElementById(`line-${index}`);
+                    if (activeLine) {
+                        activeLine.classList.add('active');
+                        lrcList.scrollTop = activeLine.offsetTop - 100;
+                    }
+                }
+            });
+        };
     </script>
 </body>
 </html>
