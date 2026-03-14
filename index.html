@@ -3,134 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CM Music Pink</title>
+    <title>CM Music Sync Master</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { 
-            background: linear-gradient(180deg, #2b1a1d 0%, #121212 100%); 
-            color: #fff0f5; 
-            font-family: 'Segoe UI', sans-serif; 
-            padding: 20px; 
-            text-align: center; 
-            min-height: 100vh;
-        }
-        .header { 
-            font-size: 28px; 
-            font-weight: bold; 
-            color: #ffb6c1; /* Бледно-розовый */
-            text-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
-            margin-bottom: 20px; 
-        }
-        .track-img { 
-            width: 250px; height: 250px; 
-            border-radius: 20px; 
-            object-fit: cover; 
-            margin-bottom: 15px; 
-            box-shadow: 0 10px 25px rgba(255, 192, 203, 0.2); 
-            border: 2px solid #ffb6c1;
-        }
-        .name { font-size: 22px; font-weight: bold; color: #fff; }
-        .artist { color: #ffdae0; opacity: 0.8; margin-bottom: 20px; }
+        body { background: linear-gradient(180deg, #2b1a1d 0%, #121212 100%); color: #fff0f5; font-family: sans-serif; padding: 20px; text-align: center; min-height: 100vh; margin: 0; }
+        .header { font-size: 24px; font-weight: bold; color: #ffb6c1; margin-bottom: 20px; text-shadow: 0 0 10px rgba(255, 182, 193, 0.5); }
+        .track-img { width: 200px; height: 200px; border-radius: 20px; object-fit: cover; border: 2px solid #ffb6c1; margin-bottom: 10px; }
         
-        /* Контейнер для караоке-текста */
-        .lyrics-container {
-            height: 220px;
-            overflow-y: hidden;
-            margin: 20px 0;
-            mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
-            font-size: 18px;
-            line-height: 2;
-        }
-        .lyrics-line { opacity: 0.2; transition: all 0.4s; padding: 5px 0; color: #ffd1dc; }
-        .lyrics-line.active { 
-            opacity: 1; 
-            color: #ffb6c1; 
-            transform: scale(1.1); 
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(255, 182, 193, 0.8);
-        }
-        
-        audio { 
-            width: 100%; 
-            filter: invert(30%) sepia(100%) saturate(200%) hue-rotate(300deg) brightness(1.2); 
-            margin-top: 20px; 
-            border-radius: 50px;
-        }
+        .lyrics-container { height: 180px; overflow-y: hidden; margin: 20px 0; font-size: 18px; line-height: 2; mask-image: linear-gradient(transparent, black 20%, black 80%, transparent); }
+        .lyrics-line { opacity: 0.2; transition: 0.3s; color: #ffd1dc; }
+        .lyrics-line.active { opacity: 1; color: #ffb6c1; transform: scale(1.1); font-weight: bold; }
 
-        .close-btn {
-            background: #ffb6c1;
-            color: #4a1e25;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 30px;
-        }
+        audio { width: 100%; filter: invert(30%) sepia(100%) saturate(200%) hue-rotate(300deg); margin-top: 10px; }
+        
+        /* Кнопки для тебя */
+        .dev-panel { background: rgba(255,192,203,0.1); padding: 15px; border-radius: 15px; border: 1px dashed #ffb6c1; margin-top: 30px; }
+        button { background: #ffb6c1; color: #4a1e25; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin: 5px; }
+        #log { background: #000; color: #0f0; font-family: monospace; font-size: 10px; padding: 10px; text-align: left; margin-top: 10px; white-space: pre-wrap; display: none; }
     </style>
 </head>
 <body>
     <div class="header">CM Music</div>
-    
-    <div id="player">
-        <img id="cover" src="https://via.placeholder.com/300/2b1a1d/ffb6c1?text=CM" class="track-img">
-        <div class="info">
-            <div id="title" class="name">Название песни</div>
-            <div id="author" class="artist">Исполнитель</div>
-        </div>
-        
-        <div class="lyrics-container" id="lrc-list">
-            </div>
+    <img id="cover" src="https://via.placeholder.com/300/2b1a1d/ffb6c1?text=CM" class="track-img">
+    <div id="title" style="font-weight: bold;">Название песни</div>
+    <div id="author" style="opacity: 0.6; font-size: 14px;">Исполнитель</div>
 
-        <audio id="audio-player" controls></audio>
+    <div class="lyrics-container" id="lrc-list"></div>
+    <audio id="audio-player" controls></audio>
+
+    <div class="dev-panel">
+        <p style="font-size: 12px; color: #ffb6c1;">ИНСТРУКЦИЯ: Жми кнопку, когда слышишь новую строку</p>
+        <button onclick="markTime()">🎵 МЕТКА ВРЕМЕНИ</button>
+        <button onclick="showResult()">СКОПИРОВАТЬ РЕЗУЛЬТАТ</button>
+        <div id="log"></div>
     </div>
-
-    <button class="close-btn" onclick="window.Telegram.WebApp.close()">Закрыть</button>
 
     <script>
         const audio = document.getElementById('audio-player');
         const lrcList = document.getElementById('lrc-list');
-        window.Telegram.WebApp.expand();
+        const log = document.getElementById('log');
 
-        // ДАННЫЕ (Поменяй на свои)
-        const track = {
-            name: "Твоя любимая песня",
-            artist: "Исполнитель",
-            img: "ССЫЛКА_НА_РОЗОВУЮ_ОБЛОЖКУ",
-            url: "ССЫЛКА_НА_МУЗЫКУ.mp3",
-            lyrics: [
-                [0, "♪ Розовое оформление готово ♪"],
-                [5, "Текст будет листаться сам"],
-                [10, "Как только ты добавишь время"],
-                [15, "Надеюсь, тебе нравится этот стиль!"],
-                [20, "CM Music в нежных тонах..."]
-            ]
-        };
+        // СЮДА ВСТАВЬ ТЕКСТ ПЕСНИ (просто слова, без цифр)
+        const rawLyrics = [
+            "Первая строчка песни",
+            "Вторая строчка песни",
+            "Припев начался",
+            "И так далее..."
+        ];
 
-        document.getElementById('title').innerText = track.name;
-        document.getElementById('author').innerText = track.artist;
-        document.getElementById('cover').src = track.img;
-        audio.src = track.url;
+        let syncData = [];
+        let currentLine = 0;
 
-        track.lyrics.forEach((line, index) => {
+        // Настройка (замени ссылки на свои!)
+        audio.src = "ССЫЛКА_ОТ_БОТА.mp3"; 
+
+        // Отрисовка текста
+        rawLyrics.forEach((text, i) => {
             const div = document.createElement('div');
             div.className = 'lyrics-line';
-            div.id = `line-${index}`;
-            div.innerText = line[1];
+            div.id = `line-${i}`;
+            div.innerText = text;
             lrcList.appendChild(div);
         });
 
+        // Функция метки
+        function markTime() {
+            const time = Math.floor(audio.currentTime);
+            if (currentLine < rawLyrics.length) {
+                syncData.push(`[${time}, "${rawLyrics[currentLine]}"]`);
+                document.getElementById(`line-${currentLine}`).classList.add('active');
+                currentLine++;
+            }
+        }
+
+        function showResult() {
+            log.style.display = 'block';
+            log.innerText = "lyrics: [\n  " + syncData.join(",\n  ") + "\n]";
+            alert("Результат внизу! Скопируй его в свой код на GitHub");
+        }
+
+        // Авто-скролл при воспроизведении
         audio.ontimeupdate = () => {
-            const curTime = audio.currentTime;
-            track.lyrics.forEach((line, index) => {
-                if (curTime >= line[0]) {
-                    document.querySelectorAll('.lyrics-line').forEach(el => el.classList.remove('active'));
-                    const activeLine = document.getElementById(`line-${index}`);
-                    if (activeLine) {
-                        activeLine.classList.add('active');
-                        lrcList.scrollTop = activeLine.offsetTop - 100;
-                    }
-                }
-            });
+            // Тут логика для уже готовых таймингов
         };
     </script>
 </body>
