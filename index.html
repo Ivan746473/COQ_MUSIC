@@ -3,80 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kai Angel - Are You Happy? | CM MUSIC</title>
+    <title>VIPERR PLAYER - Kai Angel</title>
     <style>
-        body { background: linear-gradient(180deg, #1a0b1a 0%, #000000 100%); color: #fff0f5; font-family: sans-serif; padding: 20px; text-align: center; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .header { font-size: 16px; font-weight: bold; color: #e1b1ff; margin-bottom: 30px; text-shadow: 0 0 15px rgba(225, 177, 255, 0.4); letter-spacing: 4px; text-transform: uppercase; }
-        .track-img { width: 280px; height: 280px; border-radius: 20px; object-fit: cover; border: 1px solid #4a2d4d; margin-bottom: 20px; box-shadow: 0 0 40px rgba(160, 100, 200, 0.2); }
-        .track-info { margin-bottom: 25px; }
-        .track-title { font-weight: bold; font-size: 24px; color: #e1b1ff; margin-bottom: 5px; }
-        .track-artist { opacity: 0.5; font-size: 16px; letter-spacing: 1px; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
-        .lyrics-container { height: 250px; overflow-y: hidden; width: 100%; max-width: 400px; margin-bottom: 30px; position: relative; mask-image: linear-gradient(transparent, black 30%, black 70%, transparent); }
-        .lyrics-content { transition: transform 0.5s ease-in-out; }
-        .lyrics-line { opacity: 0.15; transition: 0.4s; color: #d8bfd8; font-size: 18px; margin: 20px 0; padding: 0 10px; }
-        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); font-weight: bold; text-shadow: 0 0 10px rgba(225, 177, 255, 0.5); }
+        body { background: linear-gradient(180deg, #1a0b1a 0%, #000000 100%); color: #fff; font-family: 'Montserrat', sans-serif; padding: 20px; text-align: center; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding-bottom: 50px; }
+        .header { font-size: 14px; color: #e1b1ff; letter-spacing: 5px; text-transform: uppercase; opacity: 0.6; margin-top: 10px; }
+        
+        /* Обложка стала больше и со свечением */
+        .track-img { width: 300px; height: 300px; border-radius: 20px; object-fit: cover; border: 2px solid #3a1c3a; margin: 20px 0; box-shadow: 0 0 50px rgba(160, 100, 200, 0.3); transition: 0.3s; }
+        .track-img:hover { transform: scale(1.02); }
 
-        audio { width: 100%; max-width: 320px; filter: invert(80%) sepia(50%) saturate(1000%) hue-rotate(240deg); border-radius: 30px; }
+        .track-info { margin-bottom: 30px; }
+        .track-title { font-weight: 700; font-size: 26px; color: #fff; margin-bottom: 5px; text-shadow: 0 0 10px rgba(225, 177, 255, 0.3); }
+        .track-artist { opacity: 0.5; font-size: 16px; font-weight: 400; letter-spacing: 1px; }
+
+        /* Караоке стало огромным и супер-ярким */
+        .lyrics-container { height: 280px; overflow-y: hidden; width: 100%; max-width: 450px; position: relative; mask-image: linear-gradient(transparent, black 30%, black 70%, transparent); margin-bottom: 40px; }
+        .lyrics-content { transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .lyrics-line { opacity: 0.2; transition: 0.4s; color: #d8bfd8; font-size: 22px; font-weight: 700; margin: 25px 0; padding: 0 15px; }
+        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); text-shadow: 0 0 20px rgba(225, 177, 255, 0.8), 0 0 5px rgba(225, 177, 255, 0.5); }
+
+        /* Стильные центральные кнопки управления */
+        .player-controls { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .btn-control { background: none; border: none; color: #e1b1ff; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 10px; }
+        .btn-control:hover { transform: scale(1.2); color: #fff; text-shadow: 0 0 15px #e1b1ff; }
+        .btn-play-pause { font-size: 60px; }
+
+        /* Таймбар */
+        .progress-container { width: 100%; max-width: 320px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #e1b1ff; opacity: 0.6; margin-bottom: 20px; }
+        #progress-bar { flex-grow: 1; height: 5px; background: rgba(225, 177, 255, 0.1); border-radius: 5px; position: relative; cursor: pointer; }
+        #progress-filled { height: 100%; background: #e1b1ff; border-radius: 5px; width: 0%; box-shadow: 0 0 10px rgba(225, 177, 255, 0.5); }
+
+        /* Скрываем стандартный плеер */
+        audio { display: none; }
     </style>
 </head>
 <body>
-    <div class="header">CM MUSIC PLAYER</div>
+    <div class="header">CM MUSIC SYSTEM</div>
     
-    <img src="https://files.catbox.moe/p9pghz.jpg" class="track-img">
+    <img id="cover" src="https://files.catbox.moe/p9pghz.jpg" class="track-img" alt="Cover">
     
     <div class="track-info">
-        <div class="track-title">Are You Happy?</div>
-        <div class="track-artist">Kai Angel</div>
+        <div id="title" class="track-title">Are You Happy?</div>
+        <div id="artist" class="track-artist">Kai Angel</div>
+    </div>
+
+    <div class="player-controls">
+        <button class="btn-control" onclick="prevTrack()">⏮</button>
+        <button class="btn-control btn-play-pause" id="playPauseBtn" onclick="togglePlayPause()">▶️</button>
+        <button class="btn-control" onclick="nextTrack()">⏭</button>
+    </div>
+
+    <div class="progress-container">
+        <span id="currentTime">0:00</span>
+        <div id="progress-bar" onclick="setProgress(event)">
+            <div id="progress-filled"></div>
+        </div>
+        <span id="durationTime">0:00</span>
     </div>
 
     <div class="lyrics-container">
         <div class="lyrics-content" id="lyrics-content"></div>
     </div>
 
-    <audio id="audio-player" controls src="https://files.catbox.moe/w92z79.mp3"></audio>
+    <audio id="audio-player"></audio>
 
     <script>
-        const audio = document.getElementById('audio-player');
-        const content = document.getElementById('lyrics-content');
-
-        const lyrics = [
-            [1, "Are you happy? (Are you happy?)"], [6, "‘Cause you look sad"], [10, "Like a church with no choir"], [15, "Like a God gone mad"], [19, "Like a God gone mad on the edge of the night"], [32, "I don’t see your smile"], [36, "Your voice just doesn’t land"], [40, "I’m familiar with your desire"], [43, "And it’s very different than what’s in your hands"], [49, "Hold me like a secret"], [53, "But scream in my ear"], [55, "Tell me you love me"], [59, "Then disappear"], [61, "I don’t want the truth"], [63, "I just want a touch"], [65, "Bleed me slow"], [67, "But don’t ask for it too much"], [76, "Bleed me slow, wow"], [81, "Окей, держи меня в секрете"], [83, "И не рассказывай никому в интернете"], [85, "Ты в моих снах буквально каждый день"], [87, "I still see your eyes through the rain"], [90, "I still feel your scent like a subtle stain"], [93, "You leave ghosts in midnight air"], [95, "It’s still on my mind how you"], [97, "Hold me like a secret"], [100, "But scream in my ear"], [103, "Tell me you love me"], [107, "Then disappear"], [109, "I don’t want the truth"], [112, "I just want a touch"], [113, "Bleed me slow"], [116, "But don’t ask for it too much"], [120, "Baby, I love every surgery you did"], [124, "If I was a knife, I would stab somewhere in between"], [129, "Maybe I’m not the one to hold you like this"], [134, "But you"], [135, "Hold me like a secret"], [139, "You scream in my ear"], [141, "Tell me you love me (Do you love me?)"], [145, "Then disappear"], [148, "I don’t want the truth"], [150, "I just want a touch"], [154, "But don’t ask for it too much"], [168, "But scream in my ear"], [170, "Tell me you love me"], [174, "Then disappear"], [176, "I don’t want the truth"], [179, "I just want a touch"], [181, "Bleed me slow"], [183, "But don’t ask for it too much"]
+        // Твой плейлист
+        const playlist = [
+            {
+                title: "Are You Happy?",
+                artist: "Kai Angel",
+                cover: "https://files.catbox.moe/p9pghz.jpg",
+                src: "https://files.catbox.moe/w92z79.mp3",
+                lyrics: [[1, "Are you happy? (Are you happy?)"], [6, "‘Cause you look sad"], [10, "Like a church with no choir"], [15, "Like a God gone mad"], [19, "Like a God gone mad on the edge of the night"], [32, "I don’t see your smile"], [36, "Your voice just doesn’t land"], [40, "I’m familiar with your desire"], [43, "And it’s very different than what’s in your hands"], [49, "Hold me like a secret"], [53, "But scream in my ear"], [55, "Tell me you love me"], [59, "Then disappear"], [61, "I don’t want the truth"], [63, "I just want a touch"], [65, "Bleed me slow"], [67, "But don’t ask for it too much"], [76, "Bleed me slow, wow"], [81, "Окей, держи меня в секрете"], [83, "И не рассказывай никому в интернете"], [85, "Ты в моих снах буквально каждый день"], [87, "I still see your eyes through the rain"], [90, "I still feel your scent like a subtle stain"], [93, "You leave ghosts in midnight air"], [95, "It’s still on my mind how you"], [97, "Hold me like a secret"], [100, "But scream in my ear"], [103, "Tell me you love me"], [107, "Then disappear"], [109, "I don’t want the truth"], [112, "I just want a touch"], [113, "Bleed me slow"], [116, "But don’t ask for it too much"], [120, "Baby, I love every surgery you did"], [124, "If I was a knife, I would stab somewhere in between"], [129, "Maybe I’m not the one to hold you like this"], [134, "But you"], [135, "Hold me like a secret"], [139, "You scream in my ear"], [141, "Tell me you love me (Do you love me?)"], [145, "Then disappear"], [148, "I don’t want the truth"], [150, "I just want a touch"], [154, "But don’t ask for it too much"], [168, "But scream in my ear"], [170, "Tell me you love me"], [174, "Then disappear"], [176, "I don’t want the truth"], [179, "I just want a touch"], [181, "Bleed me slow"], [183, "But don’t ask for it too much"]]
+            },
+            {
+                title: "Вторая песня (Пример)",
+                artist: "Viperr Gang",
+                cover: "https://files.catbox.moe/p9pghz.jpg", // Сменишь потом
+                src: "", // Вставь mp3
+                lyrics: [[0, "Здесь будет текст второй песни"], [5, "Когда ты её добавишь!"]]
+            }
         ];
 
-        // Отрисовка текста
-        lyrics.forEach((line, i) => {
-            const div = document.createElement('div');
-            div.className = 'lyrics-line';
-            div.id = `line-${i}`;
-            div.innerText = line[1];
-            content.appendChild(div);
-        });
+        let currentTrackIndex = 0;
+        const audio = document.getElementById('audio-player');
+        const content = document.getElementById('lyrics-content');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBarFilled = document.getElementById('progress-filled');
 
-        // Слежение за временем
+        function loadTrack(index) {
+            const track = playlist[index];
+            document.getElementById('title').innerText = track.title;
+            document.getElementById('artist').innerText = track.artist;
+            document.getElementById('cover').src = track.cover;
+            audio.src = track.src;
+            playPauseBtn.innerText = "▶️"; // Сброс кнопки
+            
+            // Очистка и отрисовка текста
+            content.innerHTML = '';
+            track.lyrics.forEach((line, i) => {
+                const div = document.createElement('div');
+                div.className = 'lyrics-line';
+                div.id = `line-${i}`;
+                div.innerText = line[1];
+                content.appendChild(div);
+            });
+            content.style.transform = `translateY(100px)`; // Центрирование первой строки
+        }
+
+        // Кнопка Плей/Пауза
+        function togglePlayPause() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.innerText = "⏸️";
+            } else {
+                audio.pause();
+                playPauseBtn.innerText = "▶️";
+            }
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            loadTrack(currentTrackIndex);
+            audio.play();
+            playPauseBtn.innerText = "⏸️";
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+            loadTrack(currentTrackIndex);
+            audio.play();
+            playPauseBtn.innerText = "⏸️";
+        }
+
+        // Форматирование времени (0:00)
+        function formatTime(secs) {
+            if (isNaN(secs)) return "0:00";
+            let minutes = Math.floor(secs / 60);
+            let seconds = Math.floor(secs % 60);
+            return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        }
+
+        // Обновление таймбара и скролла
         audio.ontimeupdate = () => {
             const currentTime = audio.currentTime;
+            const duration = audio.duration;
+            const trackLyrics = playlist[currentTrackIndex].lyrics;
             
-            for (let i = 0; i < lyrics.length; i++) {
-                if (currentTime >= lyrics[i][0] && (!lyrics[i+1] || currentTime < lyrics[i+1][0])) {
-                    updateLyrics(i);
+            // Таймбар
+            document.getElementById('currentTime').innerText = formatTime(currentTime);
+            if (!isNaN(duration)) {
+                document.getElementById('durationTime').innerText = formatTime(duration);
+                const progressPercent = (currentTime / duration) * 100;
+                progressBarFilled.style.width = `${progressPercent}%`;
+            }
+
+            // Скролл караоке
+            for (let i = 0; i < trackLyrics.length; i++) {
+                if (currentTime >= trackLyrics[i][0] && (!trackLyrics[i+1] || currentTime < trackLyrics[i+1][0])) {
+                    const lines = document.querySelectorAll('.lyrics-line');
+                    lines.forEach(l => l.classList.remove('active'));
+                    const activeLine = document.getElementById(`line-${i}`);
+                    if (activeLine) {
+                        activeLine.classList.add('active');
+                        // Скроллим так, чтобы активная строка была чуть выше центра
+                        const offset = (i * 55) - 80; 
+                        content.style.transform = `translateY(-${offset}px)`;
+                    }
                     break;
                 }
             }
         };
 
-        function updateLyrics(index) {
-            const lines = document.querySelectorAll('.lyrics-line');
-            lines.forEach(line => line.classList.remove('active'));
-            
-            const activeLine = document.getElementById(`line-${index}`);
-            if (activeLine) {
-                activeLine.classList.add('active');
-                // Плавная прокрутка: считаем отступ
-                const offset = index * 58; // 58 - примерная высота строки с отступами
-                content.style.transform = `translateY(-${offset}px)`;
+        // Клик по таймбару
+        function setProgress(e) {
+            const width = document.getElementById('progress-bar').clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            if (!isNaN(duration)) {
+                audio.currentTime = (clickX / width) * duration;
             }
         }
+
+        // Загрузка первой песни при старте
+        loadTrack(0);
     </script>
 </body>
 </html>
