@@ -3,69 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ivan Music</title>
+    <title>CM Music</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            background-color: #121212;
+            background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
         }
-        .header { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #1DB954; }
+        .header { 
+            font-size: 28px; 
+            font-weight: 800; 
+            margin: 20px 0 30px 0; 
+            color: #1DB954; 
+            text-align: center;
+            letter-spacing: -1px;
+        }
         .player-card {
             background: #181818;
-            width: 100%;
-            border-radius: 12px;
-            padding: 15px;
-            box-sizing: border-box;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
-        .track-img { width: 150px; height: 150px; border-radius: 8px; background: #282828; margin-bottom: 15px; }
-        .track-name { font-size: 18px; margin-bottom: 5px; }
-        .artist { color: #b3b3b3; font-size: 14px; margin-bottom: 20px; }
-        audio { width: 100%; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
-        .btn {
+        .track-img { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border-radius: 10px; 
+            background: #282828; 
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .track-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .artist { color: #b3b3b3; font-size: 15px; margin-bottom: 15px; }
+        audio { 
+            width: 100%; 
+            height: 40px;
+            filter: invert(100%) hue-rotate(180deg) brightness(1.5); 
+        }
+        .footer-btn {
+            display: block;
+            width: 200px;
+            margin: 40px auto;
             background: #1DB954;
             color: black;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
+            padding: 15px;
+            border-radius: 30px;
             font-weight: bold;
-            margin-top: 20px;
-            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="header">Ivan Music</div>
+    <div class="header">CM Music</div>
     
     <div class="player-card">
-        <div class="track-img">
-            <img src="https://via.placeholder.com/150" id="cover" style="width:100%; border-radius:8px;">
-        </div>
-        <div class="track-name" id="title">Твой первый трек</div>
-        <div class="artist" id="artist">Исполнитель</div>
-        
-        <audio id="audio-player" controls>
-            <source src="ССЫЛКА_НА_ТВОЙ_ФАЙЛ.mp3" type="audio/mpeg">
+        <img src="https://via.placeholder.com/300/282828/1DB954?text=CM" class="track-img">
+        <div class="track-name">Название песни</div>
+        <div class="artist">Исполнитель</div>
+        <audio controls>
+            <source src="ССЫЛКА_НА_МУЗЫКУ_1.mp3" type="audio/mpeg">
         </audio>
     </div>
 
-    <button class="btn" onclick="tgClose()">Закрыть плеер</button>
+    <div class="player-card">
+        <img src="https://via.placeholder.com/300/282828/1DB954?text=CM" class="track-img">
+        <div class="track-name">Второй трек</div>
+        <div class="artist">Исполнитель</div>
+        <audio controls>
+            <source src="ССЫЛКА_НА_МУЗЫКУ_2.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <button class="footer-btn" onclick="window.Telegram.WebApp.close()">Закрыть плеер</button>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрывает окно на весь экран
-
-        function tgClose() {
-            tg.close();
-        }
+        window.Telegram.WebApp.expand();
     </script>
 </body>
 </html>
