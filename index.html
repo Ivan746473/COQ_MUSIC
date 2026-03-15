@@ -3,137 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COQM PRO</title>
+    <title>COQM Premium</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 30px 20px; box-sizing: border-box; overflow: hidden; }
-        .header-label { font-size: 10px; opacity: 0.4; text-transform: uppercase; letter-spacing: 4px; }
-        .track-img { width: 70vw; height: 70vw; max-width: 260px; max-height: 260px; border-radius: 20px; object-fit: cover; box-shadow: 0 0 40px rgba(225, 177, 255, 0.2); border: 1.5px solid #e1b1ff; background: #1a1a1a; }
-        .track-info { text-align: center; }
-        .track-title { font-weight: 700; font-size: 22px; color: #e1b1ff; margin-bottom: 5px; }
-        .track-artist { opacity: 0.5; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
-        .lyrics-container { height: 120px; width: 100%; overflow: hidden; mask-image: linear-gradient(transparent, black 25%, black 75%, transparent); margin: 10px 0; }
-        .lyrics-content { transition: transform 0.4s ease-out; text-align: center; }
-        .lyrics-line { opacity: 0.15; font-size: 18px; font-weight: 700; margin: 20px 0; transition: 0.3s; }
-        .lyrics-line.active { opacity: 1; color: #e1b1ff; transform: scale(1.1); text-shadow: 0 0 15px rgba(225, 177, 255, 0.6); }
-        .controls-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .progress-area { width: 90%; display: flex; align-items: center; gap: 10px; font-size: 10px; color: #e1b1ff; }
-        #progress-bar { flex-grow: 1; height: 4px; background: rgba(225, 177, 255, 0.1); border-radius: 10px; position: relative; }
-        #progress-filled { height: 100%; background: #e1b1ff; border-radius: 10px; width: 0%; box-shadow: 0 0 10px #e1b1ff; }
-        .btns-group { display: flex; align-items: center; justify-content: center; gap: 30px; }
-        .btn { background: none; border: none; padding: 0; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
-        .btn svg { fill: #e1b1ff; }
-        .btn-play svg { width: 65px; height: 65px; }
-        .btn-side svg { width: 40px; height: 40px; }
-        .tools-group { display: flex; gap: 10px; margin-top: 10px; }
-        .tool-btn { background: rgba(225, 177, 255, 0.1); border: 1px solid #e1b1ff; color: #e1b1ff; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        #debug-time { font-family: monospace; font-size: 14px; color: #e1b1ff; margin-top: 5px; min-height: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; overflow: hidden; }
+
+        /* Экраны */
+        .screen { display: none; height: 100vh; padding: 20px; padding-bottom: 150px; overflow-y: auto; }
+        .screen.active { display: block; }
+
+        h2 { font-size: 24px; margin-bottom: 20px; color: #e1b1ff; }
+
+        /* Поиск */
+        .search-box { background: #fff; border-radius: 8px; padding: 12px; display: flex; align-items: center; margin-bottom: 20px; }
+        .search-box input { border: none; outline: none; width: 100%; font-size: 16px; margin-left: 10px; color: #000; }
+
+        /* Сетка категорий (как на фото 1) */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .category-card { height: 100px; border-radius: 10px; padding: 12px; font-weight: 700; position: relative; overflow: hidden; }
+        .card-1 { background: #E8115B; } .card-2 { background: #148A08; } .card-3 { background: #BC5900; } .card-4 { background: #777777; }
+
+        /* Мини-плеер (плашка внизу) */
+        .mini-player { position: fixed; bottom: 70px; left: 10px; right: 10px; background: #282828; border-radius: 8px; display: flex; align-items: center; padding: 8px; z-index: 10; border-left: 3px solid #e1b1ff; }
+        .mini-img { width: 40px; height: 40px; border-radius: 4px; margin-right: 12px; }
+        .mini-info { flex-grow: 1; }
+        .mini-title { font-size: 14px; font-weight: 600; }
+        .mini-artist { font-size: 12px; opacity: 0.6; }
+
+        /* Полноэкранный плеер (как на фото 3) */
+        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #4a3454, #000); transition: 0.4s ease; z-index: 100; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; }
+        #full-player.open { top: 0; }
+        .close-player { position: absolute; top: 20px; left: 20px; font-size: 30px; cursor: pointer; }
+
+        .full-img { width: 85vw; height: 85vw; max-width: 320px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin: 40px 0; }
+        .full-info { width: 100%; text-align: left; margin-bottom: 20px; }
+        .full-title { font-size: 26px; font-weight: 700; }
+        .full-artist { font-size: 18px; opacity: 0.6; margin-top: 5px; }
+
+        /* Прогресс-бар */
+        .progress-container { width: 100%; margin: 20px 0; }
+        .bar { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .fill { width: 30%; height: 100%; background: #fff; border-radius: 2px; }
+        .time { display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; opacity: 0.6; }
+
+        /* Кнопки управления */
+        .controls { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 20px; }
+        .play-btn { background: #fff; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 30px; }
+
+        /* Нижняя навигация */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 50; }
+        .nav-item { text-align: center; opacity: 0.5; cursor: pointer; }
+        .nav-item.active { opacity: 1; color: #e1b1ff; }
+        .nav-item span { display: block; font-size: 10px; margin-top: 5px; }
+
+        /* Скрыть системный аудио */
         audio { display: none; }
     </style>
 </head>
 <body>
-    <div class="header-label">Viperr Music OS</div>
-    <img id="cover" src="1000061104.jpg" class="track-img">
-    <div class="track-info">
-        <div id="title" class="track-title">Загрузка...</div>
-        <div id="artist" class="track-artist">Загрузка...</div>
+
+    <div id="home" class="screen active">
+        <h2>Слушаем дальше?</h2>
+        <div class="grid">
+            <div class="category-card card-1" onclick="alert('Твой плейлист скоро будет тут!')">Любимое</div>
+            <div class="category-card card-2">Новинки</div>
+        </div>
     </div>
-    <div class="lyrics-container"><div class="lyrics-content" id="lyrics-content"></div></div>
-    <div class="controls-wrapper">
-        <div class="progress-area">
-            <span id="currentTime">0:00</span>
-            <div id="progress-bar"><div id="progress-filled"></div></div>
-            <span id="durationTime">0:00</span>
+
+    <div id="search" class="screen">
+        <h2>Поиск</h2>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Что хочешь послушать?">
         </div>
-        <div class="btns-group">
-            <button class="btn btn-side" onclick="prev()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-            <button class="btn btn-play" onclick="toggle()"><svg viewBox="0 0 24 24"><path id="playPath" d="M8 5v14l11-7z"/></svg></button>
-            <button class="btn btn-side" onclick="next()"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-10.5 0l8.5 6-8.5 6z"/></svg></button>
+        <div class="grid">
+            <div class="category-card card-1">Музыка для тебя</div>
+            <div class="category-card card-2">#borscht</div>
+            <div class="category-card card-3">Мероприятия</div>
+            <div class="category-card card-4">Для тебя</div>
         </div>
-        <div class="tools-group">
-            <button class="tool-btn" onclick="showTime()">Метка времени</button>
-            <button class="tool-btn" onclick="copyTiming()">Получить тайминг</button>
-        </div>
-        <div id="debug-time"></div>
     </div>
-    <audio id="player"></audio>
+
+    <div class="mini-player" onclick="openPlayer()">
+        <img src="1000061104.jpg" class="mini-img" id="mini-cover">
+        <div class="mini-info">
+            <div class="mini-title" id="mini-title">Are You Happy?</div>
+            <div class="mini-artist" id="mini-artist">Kai Angel</div>
+        </div>
+        <div style="font-size: 24px; margin-right: 15px;">▶</div>
+    </div>
+
+    <div id="full-player">
+        <div class="close-player" onclick="closePlayer()">∨</div>
+        <div style="font-size: 12px; opacity: 0.6; text-transform: uppercase;">Из поиска</div>
+        <div style="font-size: 12px; font-weight: 700;">"Я ВСЕ" В ПОИСКЕ</div>
+        
+        <img src="1000061104.jpg" class="full-img" id="main-cover">
+        
+        <div class="full-info">
+            <div class="full-title" id="main-title">Are You Happy?</div>
+            <div class="full-artist" id="main-artist">Kai Angel</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="bar"><div class="fill" id="progress-fill"></div></div>
+            <div class="time">
+                <span id="cur-time">0:00</span>
+                <span id="dur-time">3:07</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div style="font-size: 24px; color: #1DB954;">🔀</div>
+            <div style="font-size: 30px;" onclick="prev()">⏮</div>
+            <div class="play-btn" onclick="togglePlay()">▶</div>
+            <div style="font-size: 30px;" onclick="next()">⏭</div>
+            <div style="font-size: 24px;">🔁</div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="showScreen('home', this)">🏠<span>Главная</span></div>
+        <div class="nav-item" onclick="showScreen('search', this)">🔍<span>Поиск</span></div>
+        <div class="nav-item">📚<span>Медиатека</span></div>
+        <div class="nav-item">➕<span>Создать</span></div>
+    </div>
+
+    <audio id="audio"></audio>
 
     <script>
         const playlist = [
-            {
-                title: "Are You Happy?", artist: "Kai Angel", cover: "1000061104.jpg", src: "https://files.catbox.moe/w92z79.mp3",
-                lyrics: [[1, "Are you happy?"], [6, "‘Cause you look sad"], [10, "Like a church with no choir"], [15, "Like a God gone mad"], [19, "Like a God gone mad on the edge of the night"], [32, "I don’t see your smile"], [36, "Your voice just doesn’t land"], [40, "I’m familiar with your desire"], [43, "And it’s very different than what’s in your hands"]]
-            },
-            {
-                title: "Мой драгдилер", artist: "Hanna", cover: "1000061112.jpg", src: "https://files.catbox.moe/hok7ud.mp3",
-                lyrics: [
-                    [0, "Нажми 'Метка времени', чтобы начать"],
-                    [999, "Меня любит мой драгдилер"], // 999 - чтобы строчка не мешала сейчас
-                    [1000, "Меня любит мой, сука, драгдилер"]
-                ]
-            }
+            { title: "Are You Happy?", artist: "Kai Angel", cover: "1000061104.jpg", src: "https://files.catbox.moe/w92z79.mp3" },
+            { title: "Мой драгдилер", artist: "Hanna", cover: "1000061112.jpg", src: "https://files.catbox.moe/hok7ud.mp3" }
         ];
 
         let idx = 0;
-        const audio = document.getElementById('player');
-        const playPath = document.getElementById('playPath');
-        const content = document.getElementById('lyrics-content');
-        const debug = document.getElementById('debug-time');
+        const audio = document.getElementById('audio');
 
-        function showTime() { debug.innerText = "Время: " + audio.currentTime.toFixed(2) + " сек."; }
-        function copyTiming() {
-            const time = Math.floor(audio.currentTime);
-            const format = `[${time}, ""],`;
-            debug.innerText = "Формат: " + format;
+        function showScreen(id, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
         }
 
-        function load(i) {
-            const t = playlist[i];
-            document.getElementById('title').innerText = t.title;
-            document.getElementById('artist').innerText = t.artist;
-            document.getElementById('cover').src = t.cover;
-            audio.src = t.src;
-            content.innerHTML = '';
-            t.lyrics.forEach((l, n) => {
-                const d = document.createElement('div');
-                d.className = 'lyrics-line'; d.id = `l-${n}`; d.innerText = l[1];
-                content.appendChild(d);
-            });
-            audio.load();
+        function openPlayer() { document.getElementById('full-player').classList.add('open'); }
+        function closePlayer() { document.getElementById('full-player').classList.remove('open'); }
+
+        function loadTrack(i) {
+            const track = playlist[i];
+            document.getElementById('main-title').innerText = track.title;
+            document.getElementById('mini-title').innerText = track.title;
+            document.getElementById('main-artist').innerText = track.artist;
+            document.getElementById('mini-artist').innerText = track.artist;
+            document.getElementById('main-cover').src = track.cover;
+            document.getElementById('mini-cover').src = track.cover;
+            audio.src = track.src;
         }
 
-        function toggle() {
-            if (audio.paused) { audio.play(); playPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); }
-            else { audio.pause(); playPath.setAttribute('d', 'M8 5v14l11-7z'); }
+        function togglePlay() {
+            if (audio.paused) audio.play(); else audio.pause();
         }
 
-        function next() { idx = (idx + 1) % playlist.length; load(idx); }
-        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); }
+        function next() { idx = (idx + 1) % playlist.length; loadTrack(idx); audio.play(); }
+        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; loadTrack(idx); audio.play(); }
 
         audio.ontimeupdate = () => {
-            const cur = audio.currentTime;
-            const dur = audio.duration;
-            if (!isNaN(dur)) {
-                document.getElementById('currentTime').innerText = fmt(cur);
-                document.getElementById('durationTime').innerText = fmt(dur);
-                document.getElementById('progress-filled').style.width = (cur/dur)*100 + "%";
-            }
-            const lrc = playlist[idx].lyrics;
-            for (let i = 0; i < lrc.length; i++) {
-                if (cur >= lrc[i][0] && (!lrc[i+1] || cur < lrc[i+1][0])) {
-                    document.querySelectorAll('.lyrics-line').forEach(el => el.classList.remove('active'));
-                    const currentLine = document.getElementById(`l-${i}`);
-                    if (currentLine) {
-                        currentLine.classList.add('active');
-                        content.style.transform = `translateY(-${i * 45 - 40}px)`;
-                    }
-                    break;
-                }
-            }
+            const p = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progress-fill').style.width = p + "%";
         };
 
-        function fmt(s) { const m = Math.floor(s/60); const sc = Math.floor(s%60); return `${m}:${sc < 10 ? '0' : ''}${sc}`; }
-        load(0);
+        loadTrack(0);
     </script>
 </body>
 </html>
