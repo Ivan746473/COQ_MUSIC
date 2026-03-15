@@ -3,108 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COQM MUSIC PREMIUM</title>
+    <title>COQM MUSIC</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
-        /* ОТКЛИК КНОПОК */
-        .btn-click:active, .track-card:active { transform: scale(0.92); opacity: 0.8; }
-        .btn-click { transition: transform 0.1s ease; cursor: pointer; }
+        .btn-click:active { transform: scale(0.85); opacity: 0.6; }
+        .track-card:active { transform: scale(0.96); background: #222; }
+        .btn-click, .track-card { transition: all 0.1s ease; cursor: pointer; }
 
-        .screen { display: none; height: 100vh; padding: 20px; padding-bottom: 150px; overflow-y: auto; }
+        .screen { display: none; height: 100vh; padding: 20px; padding-bottom: 160px; overflow-y: auto; }
         .screen.active { display: block; }
         
-        /* Сетка треков */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .track-card { background: #121212; border-radius: 12px; padding: 10px; text-align: left; }
-        .track-card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 8px; }
-        .track-card div { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-card { background: #111; border-radius: 12px; padding: 12px; border: 1px solid #222; }
+        .track-card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 10px; }
+        .track-card div { font-size: 12px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
 
-        /* Плеер */
-        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; padding: 20px 25px; display: flex; flex-direction: column; }
+        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 100; padding: 30px; display: flex; flex-direction: column; }
         #full-player.open { top: 0; }
         
         .content-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .full-img { 
-            width: 82vw; height: 82vw; max-width: 330px; 
-            border-radius: 50%; object-fit: cover;
-            box-shadow: 0 0 40px rgba(255,255,255,0.05);
-            animation: rotate 15s linear infinite;
-            animation-play-state: paused;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .playing .full-img { animation-play-state: running; }
+        .full-img { width: 85vw; height: 85vw; max-width: 340px; border-radius: 20px; object-fit: cover; box-shadow: 0 0 60px rgba(255,255,255,0.08); }
 
-        /* УПРАВЛЕНИЕ (КРАСИВОЕ И ЖИРНОЕ) */
-        .controls-main { display: flex; justify-content: space-between; align-items: center; margin: 35px 0; }
-        .play-circle { background: #fff; width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 32px; font-weight: 900; }
-        .side-btn { color: #fff; font-size: 35px; opacity: 0.9; }
+        .controls-main { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; }
+        .play-circle { background: #fff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 35px; font-weight: 900; }
+        .side-btn { color: #fff; font-size: 30px; font-weight: 700; }
 
-        /* ПРОГРЕСС */
-        .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 10px; }
-        #progress-fill { height: 100%; background: #fff; width: 0%; border-radius: 2px; }
+        .progress-bg { width: 100%; height: 6px; background: #333; border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; background: #fff; width: 0%; }
 
-        /* МЕНЮ ЭКВАЛАЙЗЕРА */
-        #eq-menu { 
-            position: absolute; top: 70px; right: 25px; background: #1c1c1c; 
-            padding: 20px; border-radius: 15px; display: none; z-index: 110; width: 200px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .eq-row { margin-bottom: 15px; }
-        .eq-row label { font-size: 10px; font-weight: 800; display: block; margin-bottom: 5px; opacity: 0.6; }
-        input[type=range] { width: 100%; accent-color: #fff; }
+        #eq-menu { position: absolute; top: 80px; right: 25px; background: #151515; padding: 25px; border-radius: 20px; display: none; z-index: 120; width: 240px; border: 1px solid #333; }
+        .eq-row label { font-size: 10px; font-weight: 900; display: block; margin-bottom: 8px; color: #666; }
+        input[type=range] { width: 100%; accent-color: #fff; margin-bottom: 20px; }
 
-        /* МИНИ ПЛЕЕР */
-        .mini-player { position: fixed; bottom: 85px; left: 10px; right: 10px; background: #1a1a1a; border-radius: 12px; padding: 10px; display: flex; align-items: center; z-index: 10; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #111; }
+        .mini-player { position: fixed; bottom: 85px; left: 15px; right: 15px; background: #111; border-radius: 15px; padding: 12px; display: flex; align-items: center; z-index: 10; border: 1px solid #222; }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 20px 0; border-top: 1px solid #111; }
     </style>
 </head>
-<body id="app-body">
+<body>
 
     <div id="home" class="screen active">
-        <h2 style="font-weight: 800; letter-spacing: -1px;">ГЛАВНАЯ</h2>
+        <h1 style="font-weight: 900; text-align: center; letter-spacing: -2px;">COQM MUSIC</h1>
         <div class="grid" id="track-list"></div>
     </div>
 
     <div class="mini-player btn-click" onclick="openPlayer()">
-        <img src="1000061104.jpg" id="mini-cover" style="width:45px; height:45px; border-radius:8px; margin-right:12px;">
+        <img src="Picsart_26-03-14_21-47-19-036 (1).png" id="mini-img" style="width:50px; height:50px; border-radius:8px; margin-right:15px; object-fit: cover;">
         <div style="flex-grow:1; overflow:hidden;">
-            <b id="mini-title" style="font-size:14px;">SIRENS</b><br>
-            <small id="mini-artist" style="opacity:0.5">KAI ANGEL</small>
+            <b id="mini-title" style="font-size:14px; text-transform: uppercase;">SIRENS</b><br>
+            <small id="mini-artist" style="opacity:0.5; font-size:12px;">KAI ANGEL</small>
         </div>
-        <div id="mini-play-btn" style="font-size:24px; padding-right:10px;">▶</div>
+        <div id="mini-play-btn" style="font-size:24px; font-weight: 900; padding-right:10px;">▶</div>
     </div>
 
     <div id="full-player">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div class="btn-click" style="font-size:30px; transform:rotate(90deg);" onclick="closePlayer()">›</div>
-            <div style="font-size:10px; font-weight:800; letter-spacing:2px;">COQM MUSIC</div>
-            <div class="btn-click" style="font-size:24px;" onclick="toggleEq()">⋮</div>
+            <div class="btn-click" style="font-size:35px; transform:rotate(90deg);" onclick="closePlayer()">›</div>
+            <div style="font-size:11px; font-weight:900; letter-spacing:4px; opacity:0.4;">COQM PREMIUM</div>
+            <div class="btn-click" style="font-size:28px;" onclick="toggleEq()">⋮</div>
         </div>
 
         <div id="eq-menu">
-            <div style="font-weight:800; font-size:12px; margin-bottom:15px; text-align:center;">ЭКВАЛАЙЗЕР</div>
-            <div class="eq-row"><label>BASS (НИЗКИЕ)</label><input type="range" id="bass" min="-10" max="15" value="0"></div>
-            <div class="eq-row"><label>MID (СРЕДНИЕ)</label><input type="range" id="mid" min="-10" max="10" value="0"></div>
-            <div class="eq-row"><label>TREBLE (ВЫСОКИЕ)</label><input type="range" id="treble" min="-10" max="15" value="0"></div>
+            <div style="font-weight:900; font-size:12px; margin-bottom:20px; text-align:center;">ЭКВАЛАЙЗЕР</div>
+            <div class="eq-row"><label>BASS</label><input type="range" id="bass" min="-10" max="20" value="0"></div>
+            <div class="eq-row"><label>MID</label><input type="range" id="mid" min="-10" max="15" value="0"></div>
+            <div class="eq-row"><label>TREBLE</label><input type="range" id="treble" min="-10" max="20" value="0"></div>
         </div>
 
         <div class="content-area">
-            <img src="1000061104.jpg" id="main-cover" class="full-img">
+            <img src="Picsart_26-03-14_21-47-19-036 (1).png" id="main-cover" class="full-img">
         </div>
 
-        <div>
-            <div id="main-title" style="font-size:26px; font-weight:800; margin-bottom:5px;">SIRENS</div>
-            <div id="main-artist" style="font-size:18px; opacity:0.6;">KAI ANGEL</div>
+        <div style="text-align: center;">
+            <div id="main-title" style="font-size:28px; font-weight:900; text-transform: uppercase;">SIRENS</div>
+            <div id="main-artist" style="font-size:18px; opacity:0.4; margin-top:5px;">KAI ANGEL</div>
         </div>
 
-        <div class="progress-area" onclick="seek(event)">
-            <div class="progress-bg"><div id="progress-fill"></div></div>
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:8px; opacity:0.5;">
-                <span id="time-cur">0:00</span><span id="time-dur">0:00</span>
-            </div>
+        <div class="progress-bg" onclick="seek(event)"><div id="progress-fill"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:10px; font-weight:900; opacity:0.3;">
+            <span id="time-cur">0:00</span><span id="time-dur">0:00</span>
         </div>
 
         <div class="controls-main">
@@ -117,41 +96,43 @@
     </div>
 
     <div class="nav">
-        <div class="nav-item active btn-click">🏠</div>
+        <div class="nav-item btn-click">🏠</div>
         <div class="nav-item btn-click">🔍</div>
-        <div class="nav-item btn-click">📚</div>
+        <div class="nav-item btn-click">📂</div>
     </div>
 
     <audio id="audio" crossorigin="anonymous"></audio>
 
     <script>
+        // ВОТ ЭТА СТРОКА С ТВОИМ ФОТО
+        const globalCover = "Picsart_26-03-14_21-47-19-036 (1).png"; 
+
         const playlist = [
-            { title: "SIRENS", src: "https://files.catbox.moe/e6eczs.mp3", cover: "1000061104.jpg" },
-            { title: "FIRE WALK WITH ME", src: "https://files.catbox.moe/8v7k8t.mp3", cover: "1000061119.jpg" },
-            { title: "DESIGNERS PARADISE", src: "https://files.catbox.moe/q711k2.mp3", cover: "1000061120.jpg" },
-            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3", cover: "1000061121.jpg" },
-            { title: "444", src: "https://files.catbox.moe/c7puim.mp3", cover: "1000061124.jpg" },
-            { title: "CHELSEA SMILE", src: "https://files.catbox.moe/gdh9yi.mp3", cover: "1000061125.jpg" },
-            { title: "MIRRORS", src: "https://files.catbox.moe/4w7wd1.mp3", cover: "1000061126.jpg" },
-            { title: "AMY", src: "https://files.catbox.moe/gc0vhz.mp3", cover: "1000061127.jpg" }
+            { title: "SIRENS", src: "https://files.catbox.moe/e6eczs.mp3" },
+            { title: "FIRE WALK WITH ME", src: "https://files.catbox.moe/8v7k8t.mp3" },
+            { title: "DESIGNERS PARADISE", src: "https://files.catbox.moe/q711k2.mp3" },
+            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3" },
+            { title: "444", src: "https://files.catbox.moe/c7puim.mp3" },
+            { title: "CHELSEA SMILE", src: "https://files.catbox.moe/gdh9yi.mp3" },
+            { title: "MIRRORS", src: "https://files.catbox.moe/4w7wd1.mp3" },
+            { title: "AMY", src: "https://files.catbox.moe/gc0vhz.mp3" },
+            { title: "I'M ALL BLESSED", src: "https://files.catbox.moe/bmb2v4.mp3" },
+            { title: "WELCOME TO FOREVER", src: "https://files.catbox.moe/bmb2v4.mp3" },
+            { title: "MADAM", src: "https://files.catbox.moe/lhu1e2.mp3" },
+            { title: "BASEMENT", src: "https://files.catbox.moe/rjxfuu.mp3" }
         ];
 
         let idx = 0;
         const audio = document.getElementById('audio');
-        const body = document.getElementById('app-body');
-        
-        // ЭКВАЛАЙЗЕР ЛОГИКА
         let audioCtx, source, bassNode, midNode, trebleNode;
 
         function initEq() {
             if (audioCtx) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             source = audioCtx.createMediaElementSource(audio);
-
-            bassNode = audioCtx.createBiquadFilter(); bassNode.type = "lowshelf"; bassNode.frequency.value = 200;
+            bassNode = audioCtx.createBiquadFilter(); bassNode.type = "lowshelf"; bassNode.frequency.value = 150;
             midNode = audioCtx.createBiquadFilter(); midNode.type = "peaking"; midNode.frequency.value = 1000;
-            trebleNode = audioCtx.createBiquadFilter(); trebleNode.type = "highshelf"; trebleNode.frequency.value = 3000;
-
+            trebleNode = audioCtx.createBiquadFilter(); trebleNode.type = "highshelf"; trebleNode.frequency.value = 3500;
             source.connect(bassNode).connect(midNode).connect(trebleNode).connect(audioCtx.destination);
         }
 
@@ -159,19 +140,13 @@
         document.getElementById('mid').oninput = e => { if(midNode) midNode.gain.value = e.target.value; };
         document.getElementById('treble').oninput = e => { if(trebleNode) trebleNode.gain.value = e.target.value; };
 
-        function toggleEq() {
-            initEq();
-            const menu = document.getElementById('eq-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-
         function initHome() {
             const list = document.getElementById('track-list');
             playlist.forEach((t, i) => {
                 const card = document.createElement('div');
                 card.className = 'track-card';
-                card.onclick = () => { idx = i; load(idx); audio.play(); setIcons('❚❚'); body.classList.add('playing'); };
-                card.innerHTML = `<img src="${t.cover}"><div>${t.title}</div><div style="opacity:0.4; font-size:11px;">KAI ANGEL</div>`;
+                card.onclick = () => { idx = i; load(idx); audio.play(); setIcons('❚❚'); };
+                card.innerHTML = `<img src="${globalCover}"><div>${t.title}</div><div style="opacity:0.4; font-size:10px;">KAI ANGEL</div>`;
                 list.appendChild(card);
             });
         }
@@ -179,16 +154,16 @@
         function load(i) {
             const t = playlist[i];
             document.getElementById('main-title').innerText = t.title;
-            document.getElementById('main-cover').src = t.cover;
             document.getElementById('mini-title').innerText = t.title;
-            document.getElementById('mini-cover').src = t.cover;
+            document.getElementById('main-cover').src = globalCover;
+            document.getElementById('mini-img').src = globalCover;
             audio.src = t.src;
         }
 
         function togglePlay() {
-            initEq(); // Активируем контекст звука при первом клике
-            if(audio.paused) { audio.play(); setIcons('❚❚'); body.classList.add('playing'); } 
-            else { audio.pause(); setIcons('▶'); body.classList.remove('playing'); }
+            initEq();
+            if(audio.paused) { audio.play(); setIcons('❚❚'); } 
+            else { audio.pause(); setIcons('▶'); }
         }
 
         function setIcons(s) {
@@ -200,6 +175,7 @@
         function next() { idx = (idx + 1) % playlist.length; load(idx); audio.play(); setIcons('❚❚'); }
         function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); audio.play(); setIcons('❚❚'); }
 
+        function toggleEq() { initEq(); const menu = document.getElementById('eq-menu'); menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; }
         function openPlayer() { document.getElementById('full-player').classList.add('open'); }
         function closePlayer() { document.getElementById('full-player').classList.remove('open'); document.getElementById('eq-menu').style.display = 'none'; }
 
@@ -211,7 +187,7 @@
         };
 
         function seek(e) {
-            const rect = document.querySelector('.progress-area').getBoundingClientRect();
+            const rect = document.querySelector('.progress-bg').getBoundingClientRect();
             audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
         }
 
