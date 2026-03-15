@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COQM MUSIC VINYL PRO</title>
+    <title>COQM MUSIC VINYL FIX</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,12 +24,14 @@
         #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 100; padding: 30px; display: flex; flex-direction: column; }
         #full-player.open { top: 0; }
         
+        /* ЗОНА ВИНИЛА */
         .playback-zone { 
-            position: relative; width: 85vw; height: 85vw; max-width: 340px; 
-            margin: 0 auto;
+            position: relative; width: 85vw; height: 85vw; max-width: 320px; 
+            margin: 20px auto;
             display: flex; align-items: center; justify-content: center;
         }
 
+        /* УБИРАЕМ КЛЕТКУ У ПЛАСТИНКИ */
         .vinyl-wrapper {
             position: relative; width: 100%; height: 100%;
             background: url('vinyl_disc.png') no-repeat center center;
@@ -38,59 +40,64 @@
             display: flex; align-items: center; justify-content: center;
             animation: rotate 12s linear infinite;
             animation-play-state: paused;
+            mix-blend-mode: screen; /* Убирает темный фон/клетку, если она есть */
         }
         .playing .vinyl-wrapper { animation-play-state: running; }
 
         .vinyl-cover { 
-            width: 42%; height: 42%; border-radius: 50%; 
-            object-fit: cover; border: 3px solid #000; 
+            width: 38%; height: 38%; border-radius: 50%; 
+            object-fit: cover; border: 2px solid #000;
+            background: #000;
         }
 
+        /* КОРРЕКЦИЯ ИГЛЫ */
         .vinyl-arm {
-            position: absolute; top: -5%; right: -10%; 
-            width: 50%; height: auto; 
-            transform-origin: top right;
-            transform: rotate(20deg);
+            position: absolute; 
+            top: -20px; right: -30px; 
+            width: 160px; height: auto; 
+            transform-origin: 80% 20%;
+            transform: rotate(25deg); /* Поднята */
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 5;
-            pointer-events: none;
+            z-index: 10;
+            mix-blend-mode: screen; /* Убирает клетку вокруг иглы */
         }
-        .playing .vinyl-arm { transform: rotate(2deg); }
+        .playing .vinyl-arm { transform: rotate(5deg); } /* Опущена */
 
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+        /* ИНТЕРФЕЙС */
         .controls-main { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; }
-        .play-circle { background: #fff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 35px; }
-        .side-btn { color: #fff; font-size: 30px; }
+        .play-circle { background: #fff; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 30px; }
+        .side-btn { color: #fff; font-size: 24px; opacity: 0.8; }
 
-        .progress-bg { width: 100%; height: 6px; background: #333; border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        #progress-fill { height: 100%; background: #fff; width: 0%; }
+        .progress-bg { width: 100%; height: 4px; background: #333; border-radius: 10px; margin-top: 20px; overflow: hidden; }
+        #progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.1s linear; }
 
-        .mini-player { position: fixed; bottom: 85px; left: 15px; right: 15px; background: #111; border-radius: 15px; padding: 12px; display: flex; align-items: center; z-index: 10; border: 1px solid #222; }
+        .mini-player { position: fixed; bottom: 85px; left: 15px; right: 15px; background: #111; border-radius: 15px; padding: 10px; display: flex; align-items: center; z-index: 10; border: 1px solid #222; }
         .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 20px 0; border-top: 1px solid #111; }
     </style>
 </head>
 <body id="app-body">
 
     <div id="home" class="screen active">
-        <h1 style="font-weight: 900; text-align: center; letter-spacing: -2px; margin-top: 30px;">COQM MUSIC</h1>
+        <h1 style="font-weight: 900; text-align: center; letter-spacing: -2px; margin-top: 20px;">COQM MUSIC</h1>
         <div class="grid" id="track-list"></div>
     </div>
 
     <div class="mini-player btn-click" onclick="openPlayer()">
-        <img src="1000061091.png" style="width:50px; height:50px; border-radius:50%; margin-right:15px; object-fit: cover;">
+        <img src="1000061091.png" style="width:45px; height:45px; border-radius:50%; margin-right:12px; object-fit: cover;">
         <div style="flex-grow:1; overflow:hidden;">
-            <b id="mini-title" style="font-size:14px; text-transform: uppercase;">SIRENS</b><br>
-            <small id="mini-artist" style="opacity:0.5; font-size:12px;">KAI ANGEL</small>
+            <b id="mini-title" style="font-size:13px; text-transform: uppercase;">SIRENS</b><br>
+            <small id="mini-artist" style="opacity:0.5; font-size:11px;">KAI ANGEL</small>
         </div>
-        <div id="mini-play-btn" style="font-size:24px; font-weight: 900;">▶</div>
+        <div id="mini-play-btn">▶</div>
     </div>
 
     <div id="full-player">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <div class="btn-click" style="font-size:35px; transform:rotate(90deg);" onclick="closePlayer()">›</div>
-            <div style="font-size:11px; font-weight:900; letter-spacing:4px; opacity:0.4;">VINYL MODE</div>
-            <div style="width: 30px;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <div class="btn-click" style="font-size:30px; padding: 10px;" onclick="closePlayer()">✕</div>
+            <div style="font-size:10px; font-weight:900; letter-spacing:3px; opacity:0.4;">VINYL MODE</div>
+            <div style="width: 40px;"></div>
         </div>
 
         <div class="playback-zone">
@@ -100,29 +107,29 @@
             <img src="vinyl_arm.png" class="vinyl-arm">
         </div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <div id="main-title" style="font-size:28px; font-weight:900; text-transform: uppercase;">SIRENS</div>
-            <div id="main-artist" style="font-size:18px; opacity:0.4; margin-top:5px;">KAI ANGEL</div>
+        <div style="text-align: center; margin-top: 20px;">
+            <div id="main-title" style="font-size:24px; font-weight:900; text-transform: uppercase;">SIRENS</div>
+            <div id="main-artist" style="font-size:16px; opacity:0.4; margin-top:4px;">KAI ANGEL</div>
         </div>
 
         <div class="progress-bg" onclick="seek(event)"><div id="progress-fill"></div></div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:10px; opacity:0.3;">
+        <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:8px; opacity:0.3; font-weight:700;">
             <span id="time-cur">0:00</span><span id="time-dur">0:00</span>
         </div>
 
         <div class="controls-main">
-            <div class="side-btn btn-click">🔀</div>
-            <div class="side-btn btn-click" onclick="prev()">⏮</div>
-            <div class="play-circle btn-click" id="play-btn-full" onclick="togglePlay()">▶</div>
-            <div class="side-btn btn-click" onclick="next()">⏭</div>
-            <div class="side-btn btn-click">🔁</div>
+            <div class="side-btn">🔀</div>
+            <div class="side-btn" onclick="prev()">⏮</div>
+            <div class="play-circle" id="play-btn-full" onclick="togglePlay()">▶</div>
+            <div class="side-btn" onclick="next()">⏭</div>
+            <div class="side-btn">🔁</div>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item btn-click">🏠</div>
-        <div class="nav-item btn-click">🔍</div>
-        <div class="nav-item btn-click">📂</div>
+        <div class="nav-item">🏠</div>
+        <div class="nav-item">🔍</div>
+        <div class="nav-item">📂</div>
     </div>
 
     <audio id="audio" crossorigin="anonymous"></audio>
@@ -152,7 +159,7 @@
             playlist.forEach((t, i) => {
                 const card = document.createElement('div');
                 card.className = 'track-card';
-                card.onclick = () => { idx = i; load(idx); audio.play(); setIcons('❚❚'); body.classList.add('playing'); openPlayer(); };
+                card.onclick = () => { idx = i; load(idx); audio.play(); updateUI(true); openPlayer(); };
                 card.innerHTML = `<img src="1000061091.png"><div>${t.title}</div><div style="opacity:0.4; font-size:10px;">KAI ANGEL</div>`;
                 list.appendChild(card);
             });
@@ -166,18 +173,21 @@
         }
 
         function togglePlay() {
-            if(audio.paused) { audio.play(); setIcons('❚❚'); body.classList.add('playing'); } 
-            else { audio.pause(); setIcons('▶'); body.classList.remove('playing'); }
+            if(audio.paused) { audio.play(); updateUI(true); } 
+            else { audio.pause(); updateUI(false); }
         }
 
-        function setIcons(s) {
-            document.getElementById('play-btn-full').innerText = s;
-            document.getElementById('mini-play-btn').innerText = s === '❚❚' ? '❚❚' : '▶';
+        function updateUI(isPlaying) {
+            const icon = isPlaying ? '❚❚' : '▶';
+            document.getElementById('play-btn-full').innerText = icon;
+            document.getElementById('mini-play-btn').innerText = icon;
+            if(isPlaying) body.classList.add('playing');
+            else body.classList.remove('playing');
         }
 
         audio.onended = () => next();
-        function next() { idx = (idx + 1) % playlist.length; load(idx); audio.play(); setIcons('❚❚'); body.classList.add('playing'); }
-        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); audio.play(); setIcons('❚❚'); body.classList.add('playing'); }
+        function next() { idx = (idx + 1) % playlist.length; load(idx); audio.play(); updateUI(true); }
+        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); audio.play(); updateUI(true); }
 
         function openPlayer() { document.getElementById('full-player').classList.add('open'); }
         function closePlayer() { document.getElementById('full-player').classList.remove('open'); }
