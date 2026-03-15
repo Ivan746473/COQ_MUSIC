@@ -3,214 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COQM MUSIC VINYL FIX</title>
+    <title>COQM MUSIC FIXED</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
-        .btn-click:active { transform: scale(0.85); opacity: 0.6; }
-        .track-card:active { transform: scale(0.96); background: #222; }
-        .btn-click, .track-card { transition: all 0.1s ease; cursor: pointer; }
-
-        .screen { display: none; height: 100vh; padding: 20px; padding-bottom: 160px; overflow-y: auto; }
-        .screen.active { display: block; }
+        /* ЭФФЕКТЫ НАЖАТИЯ */
+        .btn-click:active { transform: scale(0.9); opacity: 0.7; }
+        .track-card:active { transform: scale(0.95); background: #1a1a1a; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .track-card { background: #111; border-radius: 12px; padding: 12px; border: 1px solid #222; }
-        .track-card img { width: 100%; border-radius: 8px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 10px; }
-        .track-card div { font-size: 12px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-
-        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 100; padding: 30px; display: flex; flex-direction: column; }
+        /* ЗОНА ПЛЕЕРА */
+        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.5s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 100; padding: 25px; display: flex; flex-direction: column; }
         #full-player.open { top: 0; }
-        
-        /* ЗОНА ВИНИЛА */
+
+        /* ГЛАВНАЯ МАГИЯ: УБИРАЕМ КЛЕТКУ */
         .playback-zone { 
-            position: relative; width: 85vw; height: 85vw; max-width: 320px; 
-            margin: 20px auto;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; width: 80vw; height: 80vw; max-width: 300px; 
+            margin: 30px auto; 
         }
 
-        /* УБИРАЕМ КЛЕТКУ У ПЛАСТИНКИ */
         .vinyl-wrapper {
             position: relative; width: 100%; height: 100%;
-            background: url('vinyl_disc.png') no-repeat center center;
-            background-size: cover;
-            border-radius: 50%;
+            border-radius: 50%; /* ДЕЛАЕМ КРУГЛЫМ */
+            overflow: hidden; /* ОБРЕЗАЕМ КЛЕТКУ ПО КРАЯМ */
+            background: #000 url('vinyl_disc.png') no-repeat center center;
+            background-size: 110%; /* НЕМНОГО УВЕЛИЧИВАЕМ, ЧТОБЫ СКРЫТЬ КРАЯ */
             display: flex; align-items: center; justify-content: center;
-            animation: rotate 12s linear infinite;
+            box-shadow: 0 0 50px rgba(255,255,255,0.05);
+            animation: rotate 10s linear infinite;
             animation-play-state: paused;
-            mix-blend-mode: screen; /* Убирает темный фон/клетку, если она есть */
         }
         .playing .vinyl-wrapper { animation-play-state: running; }
 
         .vinyl-cover { 
-            width: 38%; height: 38%; border-radius: 50%; 
-            object-fit: cover; border: 2px solid #000;
-            background: #000;
+            width: 40%; height: 40%; border-radius: 50%; 
+            object-fit: cover; border: 4px solid #000; z-index: 2;
         }
 
-        /* КОРРЕКЦИЯ ИГЛЫ */
-        .vinyl-arm {
-            position: absolute; 
-            top: -20px; right: -30px; 
-            width: 160px; height: auto; 
-            transform-origin: 80% 20%;
-            transform: rotate(25deg); /* Поднята */
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-            mix-blend-mode: screen; /* Убирает клетку вокруг иглы */
+        /* ИГЛА БЕЗ ЛИШНЕГО ФОНА */
+        .vinyl-arm-container {
+            position: absolute; top: -30px; right: -40px;
+            width: 150px; height: 150px;
+            pointer-events: none; z-index: 10;
         }
-        .playing .vinyl-arm { transform: rotate(5deg); } /* Опущена */
+
+        .vinyl-arm {
+            width: 100%; height: auto;
+            transform-origin: 80% 20%;
+            transform: rotate(25deg);
+            transition: transform 0.8s ease;
+            /* Пытаемся скрыть фон самой картинки иглы */
+            filter: drop-shadow(0 0 0 black); 
+            clip-path: inset(0 0 10% 0); /* Немного обрезаем края картинки */
+        }
+        .playing .vinyl-arm { transform: rotate(5deg); }
 
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* ИНТЕРФЕЙС */
-        .controls-main { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; }
-        .play-circle { background: #fff; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 30px; }
-        .side-btn { color: #fff; font-size: 24px; opacity: 0.8; }
+        .controls { display: flex; justify-content: space-around; align-items: center; margin-top: 40px; }
+        .play-btn { background: #fff; color: #000; width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        
+        .progress-bar { width: 100%; height: 4px; background: #222; border-radius: 2px; margin-top: 30px; position: relative; }
+        #progress-fill { position: absolute; height: 100%; background: #fff; width: 0%; border-radius: 2px; }
 
-        .progress-bg { width: 100%; height: 4px; background: #333; border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        #progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.1s linear; }
+        /* СПИСОК */
+        .screen { padding: 20px; padding-bottom: 120px; height: 100vh; overflow-y: auto; display: none; }
+        .screen.active { display: block; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .track-card { background: #0a0a0a; border-radius: 15px; padding: 10px; border: 1px solid #1a1a1a; }
+        .track-card img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
 
-        .mini-player { position: fixed; bottom: 85px; left: 15px; right: 15px; background: #111; border-radius: 15px; padding: 10px; display: flex; align-items: center; z-index: 10; border: 1px solid #222; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 20px 0; border-top: 1px solid #111; }
+        .mini-player { position: fixed; bottom: 80px; left: 10px; right: 10px; background: #111; padding: 12px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #222; }
     </style>
 </head>
 <body id="app-body">
 
     <div id="home" class="screen active">
-        <h1 style="font-weight: 900; text-align: center; letter-spacing: -2px; margin-top: 20px;">COQM MUSIC</h1>
+        <h1 style="text-align:center; font-weight:900; letter-spacing:-2px;">COQM MUSIC</h1>
         <div class="grid" id="track-list"></div>
     </div>
 
     <div class="mini-player btn-click" onclick="openPlayer()">
-        <img src="1000061091.png" style="width:45px; height:45px; border-radius:50%; margin-right:12px; object-fit: cover;">
-        <div style="flex-grow:1; overflow:hidden;">
-            <b id="mini-title" style="font-size:13px; text-transform: uppercase;">SIRENS</b><br>
-            <small id="mini-artist" style="opacity:0.5; font-size:11px;">KAI ANGEL</small>
-        </div>
-        <div id="mini-play-btn">▶</div>
+        <img src="1000061091.png" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+        <div style="flex:1"><b>SIRENS</b><br><small style="opacity:0.5">KAI ANGEL</small></div>
+        <div id="mini-play">▶</div>
     </div>
 
     <div id="full-player">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-            <div class="btn-click" style="font-size:30px; padding: 10px;" onclick="closePlayer()">✕</div>
-            <div style="font-size:10px; font-weight:900; letter-spacing:3px; opacity:0.4;">VINYL MODE</div>
-            <div style="width: 40px;"></div>
-        </div>
-
+        <div onclick="closePlayer()" style="font-size:30px; opacity:0.5">✕</div>
+        
         <div class="playback-zone">
             <div class="vinyl-wrapper">
                 <img src="1000061091.png" class="vinyl-cover">
             </div>
-            <img src="vinyl_arm.png" class="vinyl-arm">
+            <div class="vinyl-arm-container">
+                <img src="vinyl_arm.png" class="vinyl-arm">
+            </div>
         </div>
 
-        <div style="text-align: center; margin-top: 20px;">
-            <div id="main-title" style="font-size:24px; font-weight:900; text-transform: uppercase;">SIRENS</div>
-            <div id="main-artist" style="font-size:16px; opacity:0.4; margin-top:4px;">KAI ANGEL</div>
+        <div style="text-align:center; margin-top:20px;">
+            <h2 id="m-title" style="margin:0; font-weight:900; text-transform:uppercase;">SIRENS</h2>
+            <p style="opacity:0.4; margin:5px 0;">KAI ANGEL</p>
         </div>
 
-        <div class="progress-bg" onclick="seek(event)"><div id="progress-fill"></div></div>
-        <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:8px; opacity:0.3; font-weight:700;">
-            <span id="time-cur">0:00</span><span id="time-dur">0:00</span>
-        </div>
-
-        <div class="controls-main">
-            <div class="side-btn">🔀</div>
-            <div class="side-btn" onclick="prev()">⏮</div>
-            <div class="play-circle" id="play-btn-full" onclick="togglePlay()">▶</div>
-            <div class="side-btn" onclick="next()">⏭</div>
-            <div class="side-btn">🔁</div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        
+        <div class="controls">
+            <div class="btn-click" onclick="prev()" style="font-size:30px">⏮</div>
+            <div class="play-btn btn-click" id="main-play" onclick="togglePlay()">▶</div>
+            <div class="btn-click" onclick="next()" style="font-size:30px">⏭</div>
         </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item">🏠</div>
-        <div class="nav-item">🔍</div>
-        <div class="nav-item">📂</div>
-    </div>
-
-    <audio id="audio" crossorigin="anonymous"></audio>
+    <audio id="audio"></audio>
 
     <script>
         const playlist = [
             { title: "SIRENS", src: "https://files.catbox.moe/e6eczs.mp3" },
             { title: "FIRE WALK WITH ME", src: "https://files.catbox.moe/8v7k8t.mp3" },
             { title: "DESIGNERS PARADISE", src: "https://files.catbox.moe/q711k2.mp3" },
-            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3" },
-            { title: "444", src: "https://files.catbox.moe/c7puim.mp3" },
-            { title: "CHELSEA SMILE", src: "https://files.catbox.moe/gdh9yi.mp3" },
-            { title: "MIRRORS", src: "https://files.catbox.moe/4w7wd1.mp3" },
-            { title: "AMY", src: "https://files.catbox.moe/gc0vhz.mp3" },
-            { title: "I'M ALL BLESSED", src: "https://files.catbox.moe/bmb2v4.mp3" },
-            { title: "WELCOME TO FOREVER", src: "https://files.catbox.moe/bmb2v4.mp3" },
-            { title: "MADAM", src: "https://files.catbox.moe/lhu1e2.mp3" },
-            { title: "BASEMENT", src: "https://files.catbox.moe/rjxfuu.mp3" }
+            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3" }
         ];
 
         let idx = 0;
         const audio = document.getElementById('audio');
         const body = document.getElementById('app-body');
 
-        function initHome() {
+        function init() {
             const list = document.getElementById('track-list');
             playlist.forEach((t, i) => {
                 const card = document.createElement('div');
                 card.className = 'track-card';
-                card.onclick = () => { idx = i; load(idx); audio.play(); updateUI(true); openPlayer(); };
-                card.innerHTML = `<img src="1000061091.png"><div>${t.title}</div><div style="opacity:0.4; font-size:10px;">KAI ANGEL</div>`;
+                card.onclick = () => { idx = i; load(i); audio.play(); status(true); openPlayer(); };
+                card.innerHTML = `<img src="1000061091.png"><div>${t.title}</div>`;
                 list.appendChild(card);
             });
         }
 
         function load(i) {
-            const t = playlist[i];
-            document.getElementById('main-title').innerText = t.title;
-            document.getElementById('mini-title').innerText = t.title;
-            audio.src = t.src;
+            audio.src = playlist[i].src;
+            document.getElementById('m-title').innerText = playlist[i].title;
         }
 
         function togglePlay() {
-            if(audio.paused) { audio.play(); updateUI(true); } 
-            else { audio.pause(); updateUI(false); }
+            if(audio.paused) { audio.play(); status(true); } 
+            else { audio.pause(); status(false); }
         }
 
-        function updateUI(isPlaying) {
-            const icon = isPlaying ? '❚❚' : '▶';
-            document.getElementById('play-btn-full').innerText = icon;
-            document.getElementById('mini-play-btn').innerText = icon;
-            if(isPlaying) body.classList.add('playing');
-            else body.classList.remove('playing');
+        function status(p) {
+            const icon = p ? '❚❚' : '▶';
+            document.getElementById('main-play').innerText = icon;
+            document.getElementById('mini-play').innerText = icon;
+            p ? body.classList.add('playing') : body.classList.remove('playing');
         }
 
-        audio.onended = () => next();
-        function next() { idx = (idx + 1) % playlist.length; load(idx); audio.play(); updateUI(true); }
-        function prev() { idx = (idx - 1 + playlist.length) % playlist.length; load(idx); audio.play(); updateUI(true); }
-
+        function next() { idx=(idx+1)%playlist.length; load(idx); audio.play(); status(true); }
+        function prev() { idx=(idx-1+playlist.length)%playlist.length; load(idx); audio.play(); status(true); }
+        
         function openPlayer() { document.getElementById('full-player').classList.add('open'); }
         function closePlayer() { document.getElementById('full-player').classList.remove('open'); }
 
         audio.ontimeupdate = () => {
-            const pct = (audio.currentTime / audio.duration) * 100 || 0;
-            document.getElementById('progress-fill').style.width = pct + "%";
-            document.getElementById('time-cur').innerText = fmt(audio.currentTime);
-            document.getElementById('time-dur').innerText = fmt(audio.duration || 0);
+            const p = (audio.currentTime / audio.duration) * 100 || 0;
+            document.getElementById('progress-fill').style.width = p + "%";
         };
 
-        function seek(e) {
-            const rect = document.querySelector('.progress-bg').getBoundingClientRect();
-            audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-        }
-
-        function fmt(s) { 
-            const m = Math.floor(s/60); const sc = Math.floor(s%60); 
-            return `${m}:${sc < 10 ? '0' : ''}${sc}`; 
-        }
-
-        initHome();
-        load(0);
+        init(); load(0);
     </script>
 </body>
 </html>
