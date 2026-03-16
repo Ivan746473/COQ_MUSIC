@@ -3,162 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COQM MUSIC PURE</title>
+    <title>COQM MUSIC ULTIMATE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
-        .btn-click:active { transform: scale(0.9); opacity: 0.8; }
+        .btn-active:active { transform: scale(0.92); opacity: 0.8; }
+        
+        /* Главный экран со списком */
+        .main-screen { padding: 20px; padding-bottom: 120px; height: 100vh; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .track-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 12px; border-radius: 18px; transition: 0.2s; }
+        .track-card img { width: 100%; border-radius: 12px; margin-bottom: 10px; display: block; }
+        .track-card b { font-size: 13px; text-transform: uppercase; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.5s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 100; padding: 30px; display: flex; flex-direction: column; align-items: center; }
-        #full-player.open { top: 0; }
+        /* Полноэкранный плеер */
+        #player-page { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: #000; transition: 0.5s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 1000; padding: 30px; display: flex; flex-direction: column; align-items: center; }
+        #player-page.open { top: 0; }
 
-        /* ВИНИЛ ЦЕЛИКОМ НА CSS (БЕЗ КАРТИНОК ФОНА) */
-        .vinyl-container {
-            position: relative;
-            width: 80vw; height: 80vw; max-width: 300px;
-            margin-top: 50px;
+        /* Виниловая зона */
+        .vinyl-zone { position: relative; width: 85vw; height: 85vw; max-width: 320px; margin: 40px auto; }
+        
+        /* Пластинка кодом */
+        .vinyl-record {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: radial-gradient(circle, #222 0%, #050505 15%, #111 20%, #050505 25%, #111 30%, #050505 40%, #111 50%, #050505 60%, #111 70%, #050505 80%, #111 90%, #050505 100%);
             display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            animation: rotate 12s linear infinite; animation-play-state: paused;
         }
+        .playing .vinyl-record { animation-play-state: running; }
 
-        .vinyl-disc {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            /* Рисуем дорожки винила градиентом */
-            background: radial-gradient(circle, #333 0%, #111 2%, #111 10%, #050505 15%, #111 20%, #050505 25%, #111 30%, #050505 35%, #111 40%, #050505 45%, #111 50%, #050505 55%, #111 60%, #050505 65%, #111 70%, #050505 75%, #111 80%, #050505 85%, #111 90%, #050505 100%);
-            box-shadow: 0 0 40px rgba(0,0,0,1), inset 0 0 10px rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            animation: rotate 10s linear infinite;
-            animation-play-state: paused;
-        }
-        .playing .vinyl-disc { animation-play-state: running; }
+        .center-logo { width: 38%; height: 38%; border-radius: 50%; border: 4px solid #000; object-fit: cover; }
 
-        .vinyl-center-logo {
-            width: 35%; height: 35%;
-            border-radius: 50%;
-            border: 4px solid #000;
-            object-fit: cover;
-            background: #222;
+        /* Тонарм (Игла) кодом */
+        .arm {
+            position: absolute; top: -15px; right: 0px; width: 130px; height: 8px;
+            background: linear-gradient(to bottom, #999, #444); border-radius: 10px;
+            transform-origin: 90% 50%; transform: rotate(25deg); transition: 0.8s ease; z-index: 10;
         }
-
-        /* ИГЛА (ТОНАРМ) НА CSS */
-        .tonearm {
-            position: absolute;
-            top: -20px; right: 10px;
-            width: 120px; height: 10px;
-            background: linear-gradient(to bottom, #888, #444);
-            border-radius: 5px;
-            transform-origin: right center;
-            transform: rotate(30deg);
-            transition: transform 0.8s ease;
-            z-index: 10;
-        }
-        .tonearm::before { /* Держатель */
-            content: ''; position: absolute; right: -10px; top: -10px;
-            width: 30px; height: 30px; background: #222; border-radius: 50%;
-        }
-        .tonearm::after { /* Сама игла */
-            content: ''; position: absolute; left: 0; top: 5px;
-            width: 20px; height: 15px; background: #666; border-radius: 2px;
-        }
-        .playing .tonearm { transform: rotate(0deg); }
+        .arm::after { content: ''; position: absolute; left: 0; top: 2px; width: 25px; height: 18px; background: #555; border-radius: 3px; }
+        .playing .arm { transform: rotate(-5deg); }
 
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* ОСТАЛЬНОЙ ИНТЕРФЕЙС */
-        .info { text-align: center; margin-top: 30px; }
-        .info h2 { font-weight: 900; margin: 0; text-transform: uppercase; }
-        .info p { opacity: 0.4; margin: 5px 0; }
+        /* Управление */
+        .song-info { text-align: center; margin-top: 30px; }
+        .song-info h2 { font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .song-info p { opacity: 0.4; margin: 5px 0; font-size: 18px; }
 
-        .progress { width: 100%; height: 4px; background: #222; margin-top: 30px; position: relative; border-radius: 2px; }
-        #bar { position: absolute; height: 100%; background: #fff; width: 0%; border-radius: 2px; }
+        .progress-box { width: 100%; height: 5px; background: #222; border-radius: 10px; margin-top: 40px; }
+        #fill { height: 100%; background: #fff; width: 0%; border-radius: 10px; }
 
-        .controls { display: flex; width: 100%; justify-content: space-around; align-items: center; margin-top: 40px; }
-        .play-btn { background: #fff; color: #000; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .btns { display: flex; width: 100%; justify-content: space-around; align-items: center; margin-top: 50px; }
+        .main-play { background: #fff; color: #000; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; }
 
-        /* СПИСОК */
-        .home { padding: 20px; display: block; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .card { background: #0a0a0a; padding: 10px; border-radius: 15px; border: 1px solid #1a1a1a; text-align: center; font-size: 12px; }
-        .card img { width: 100%; border-radius: 10px; margin-bottom: 8px; }
-
-        .mini { position: fixed; bottom: 20px; left: 15px; right: 15px; background: #111; padding: 12px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #222; }
+        /* Мини-плеер */
+        .mini-p { position: fixed; bottom: 20px; left: 15px; right: 15px; background: #111; padding: 12px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #222; z-index: 100; }
+        .mini-p img { width: 45px; height: 45px; border-radius: 15px; margin-right: 15px; object-fit: cover; }
     </style>
 </head>
-<body id="app">
+<body id="app-body">
 
-    <div class="home">
-        <h1 style="text-align:center; font-weight:900;">COQM MUSIC</h1>
-        <div class="grid" id="list"></div>
+    <div class="main-screen">
+        <h1 style="text-align:center; font-weight:900; font-size: 36px; letter-spacing: -2px; margin: 20px 0;">COQM MUSIC</h1>
+        <div class="grid" id="track-list"></div>
     </div>
 
-    <div class="mini btn-click" onclick="openP()">
-        <img src="1000061091.png" style="width:40px; height:40px; border-radius:50%; margin-right:12px; object-fit: cover;">
-        <div style="flex:1"><b id="min-t">SIRENS</b></div>
-        <div id="min-b">▶</div>
+    <div class="mini-p btn-active" onclick="openPlayer()">
+        <img src="1000061091.png">
+        <div style="flex:1"><b id="min-title">SIRENS</b><br><small style="opacity:0.5">KAI ANGEL</small></div>
+        <div id="min-play-btn" style="font-size:20px;">▶</div>
     </div>
 
-    <div id="full-player">
-        <div onclick="closeP()" style="align-self: flex-start; font-size: 35px; opacity: 0.3;">✕</div>
+    <div id="player-page">
+        <div onclick="closePlayer()" style="align-self: flex-start; font-size: 40px; opacity: 0.2; padding: 10px;">✕</div>
         
-        <div class="vinyl-container">
-            <div class="tonearm"></div>
-            <div class="vinyl-disc">
-                <img src="1000061091.png" class="vinyl-center-logo">
+        <div class="vinyl-zone">
+            <div class="arm"></div>
+            <div class="vinyl-record">
+                <img src="1000061091.png" class="center-logo">
             </div>
         </div>
 
-        <div class="info">
-            <h2 id="f-t">SIRENS</h2>
+        <div class="song-info">
+            <h2 id="f-title">SIRENS</h2>
             <p>KAI ANGEL</p>
         </div>
 
-        <div class="progress"><div id="bar"></div></div>
+        <div class="progress-box"><div id="fill"></div></div>
         
-        <div class="controls">
-            <div class="btn-click" onclick="prev()" style="font-size:30px">⏮</div>
-            <div class="play-btn btn-click" id="f-b" onclick="toggle()">▶</div>
-            <div class="btn-click" onclick="next()" style="font-size:30px">⏭</div>
+        <div class="btns">
+            <div class="btn-active" onclick="prev()" style="font-size:35px">⏮</div>
+            <div class="main-play btn-active" id="f-play-btn" onclick="toggle()">▶</div>
+            <div class="btn-active" onclick="next()" style="font-size:35px">⏭</div>
         </div>
     </div>
 
-    <audio id="audio"></audio>
+    <audio id="player-audio"></audio>
 
     <script>
         const songs = [
             { title: "SIRENS", src: "https://files.catbox.moe/e6eczs.mp3" },
             { title: "FIRE WALK WITH ME", src: "https://files.catbox.moe/8v7k8t.mp3" },
             { title: "DESIGNERS PARADISE", src: "https://files.catbox.moe/q711k2.mp3" },
-            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3" }
+            { title: "PARASOCIAL FREESTYLE", src: "https://files.catbox.moe/nlkvvb.mp3" },
+            { title: "444", src: "https://files.catbox.moe/c7puim.mp3" },
+            { title: "CHELSEA SMILE", src: "https://files.catbox.moe/gdh9yi.mp3" },
+            { title: "MIRRORS", src: "https://files.catbox.moe/4w7wd1.mp3" },
+            { title: "AMY", src: "https://files.catbox.moe/gc0vhz.mp3" },
+            { title: "I'M ALL BLESSED", src: "https://files.catbox.moe/bmb2v4.mp3" },
+            { title: "WELCOME TO FOREVER", src: "https://files.catbox.moe/bmb2v4.mp3" },
+            { title: "MADAM", src: "https://files.catbox.moe/lhu1e2.mp3" },
+            { title: "BASEMENT", src: "https://files.catbox.moe/rjxfuu.mp3" }
         ];
 
-        let cur = 0;
-        const audio = document.getElementById('audio');
-        const app = document.getElementById('app');
+        let currentIdx = 0;
+        const audio = document.getElementById('player-audio');
+        const body = document.getElementById('app-body');
 
         function init() {
-            const list = document.getElementById('list');
+            const list = document.getElementById('track-list');
             songs.forEach((s, i) => {
-                const div = document.createElement('div');
-                div.className = 'card btn-click';
-                div.onclick = () => { cur = i; play(); openP(); };
-                div.innerHTML = `<img src="1000061091.png"><b>${s.title}</b>`;
-                list.appendChild(div);
+                const card = document.createElement('div');
+                card.className = 'track-card btn-active';
+                card.onclick = () => { currentIdx = i; startPlay(); openPlayer(); };
+                card.innerHTML = `<img src="1000061091.png"><b>${s.title}</b>`;
+                list.appendChild(card);
             });
         }
 
-        function play() {
-            audio.src = songs[cur].src;
-            document.getElementById('f-t').innerText = songs[cur].title;
-            document.getElementById('min-t').innerText = songs[cur].title;
+        function startPlay() {
+            audio.src = songs[currentIdx].src;
+            document.getElementById('f-title').innerText = songs[currentIdx].title;
+            document.getElementById('min-title').innerText = songs[currentIdx].title;
             audio.play();
-            ui(true);
+            updateStatus(true);
         }
 
         function toggle() {
-            audio.paused ? (audio.play(), ui(true)) : (audio.pause(), ui(false));
+            audio.paused ? (audio.play(), updateStatus(true)) : (audio.pause(), updateStatus(false));
         }
 
-        function ui(p)
+        function updateStatus(playing) {
+            const icon = playing ? '❚❚' : '▶';
+            document.getElementById('f-play-btn').innerText = icon;
+            document.getElementById('min-play-btn').innerText = icon;
+            playing ? body.classList.add('playing') : body.classList.remove('playing');
+        }
+
+        function next() { currentIdx = (currentIdx + 1) % songs.length; startPlay(); }
+        function prev() { currentIdx = (currentIdx - 1 + songs.length) % songs.length; startPlay(); }
         
+        function openPlayer() { document.getElementById('player-page').classList.add('open'); }
+        function closePlayer() { document.getElementById('player-page').classList.remove('open'); }
+
+        audio.ontimeupdate = () => {
+            const p = (audio.currentTime / audio.duration) * 100 || 0;
+            document.getElementById('fill').style.width = p + "%";
+        };
+
+        audio.onended = next;
+
+        init();
+        audio.src = songs[0].src;
+    </script>
+</body>
+</html>
